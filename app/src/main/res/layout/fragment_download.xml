@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Header -->
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/black"
+            app:title="Downloads"
+            app:titleTextColor="@color/white">
+
+            <ImageView
+                android:id="@+id/btn_settings"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="end"
+                android:layout_marginEnd="16dp"
+                android:src="@android:drawable/ic_menu_manage"
+                app:tint="@color/white" />
+
+        </androidx.appcompat.widget.Toolbar>
+
+        <!-- Storage Info -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/storage_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1.2 GB of 32.0 GB used"
+                android:textColor="#808080"
+                android:textSize="14sp" />
+
+            <ProgressBar
+                android:id="@+id/storage_progress"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:layout_marginTop="8dp"
+                android:progress="25"
+                android:progressTint="@color/white"
+                android:progressBackgroundTint="#808080" />
+        </LinearLayout>
+
+        <!-- Smart Downloads Info -->
+        <LinearLayout
+            android:id="@+id/smart_downloads_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#1A1A1A"
+            android:orientation="horizontal"
+            android:padding="16dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_popup_sync"
+                app:tint="@color/white" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_weight="1"
+                android:text="Smart Downloads ON"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+
+            <Switch
+                android:id="@+id/smart_downloads_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true" />
+        </LinearLayout>
+
+        <!-- Downloads List -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/downloads_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:visibility="gone" />
+
+        <!-- Empty State -->
+        <LinearLayout
+            android:id="@+id/empty_state_container"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="32dp">
+
+            <ImageView
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:src="@drawable/download_arrow"
+                app:tint="#808080" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:text="Movies and TV shows that you\ndownload appear here"
+                android:textColor="#808080"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/find_content_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:backgroundTint="@color/white"
+                android:text="Find Something to Download"
+                android:textColor="@color/black" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,0 +1,127 @@
+package com.example.netflixplus.utils;
+
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+import com.example.netflixplus.R;
+import com.example.netflixplus.entities.MediaResponse;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * RecyclerView adapter for displaying movie thumbnails in a grid layout.
+ * This adapter handles the creation and binding of movie view holders,
+ * loading movie thumbnails using Glide, and managing click events.
+ */
+public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder> {
+    private List<MediaResponse> movies;
+    private final OnMovieClickListener listener;
+
+
+    /**
+     * Constructs a new MovieAdapter with a click listener.
+     * @param listener The callback interface for handling movie click events
+     */
+    public MovieAdapter(OnMovieClickListener listener) {
+        this.listener = listener;
+        this.movies = new ArrayList<>();
+    }
+
+
+    /**
+     * Updates the adapter's movie list and refreshes the view.
+     * @param movies New list of movies to display
+     */
+    public void setMovies(@NonNull List<MediaResponse> movies) {
+        this.movies = new ArrayList<>(movies); // Create defensive copy
+        notifyDataSetChanged();
+    }
+
+
+    @NonNull
+    @Override
+    public MovieViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = createMovieCardView(parent);
+        return new MovieViewHolder(view);
+    }
+
+
+    /**
+     * Creates the movie card view by inflating the layout.
+     * @param parent The parent ViewGroup
+     * @return Inflated movie card view
+     */
+    private View createMovieCardView(@NonNull ViewGroup parent) {
+        return LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.movie_card, parent, false);
+    }
+
+
+    @Override
+    public void onBindViewHolder(@NonNull MovieViewHolder holder, int position) {
+        MediaResponse movie = movies.get(position);
+        loadMovieThumbnail(holder, movie);
+        setupClickListener(holder, movie);
+    }
+
+
+    /**
+     * Loads the movie thumbnail using Glide library.
+     * @param holder The ViewHolder to load the image into
+     * @param movie The movie containing the thumbnail URL
+     */
+    private void loadMovieThumbnail(@NonNull MovieViewHolder holder, @NonNull MediaResponse movie) {
+        Glide.with(holder.itemView.getContext())
+                .load(movie.getThumbnail())
+                .centerCrop()
+                .into(holder.posterImage);
+    }
+
+
+    /**
+     * Sets up the click listener for the movie item.
+     * @param holder The ViewHolder to attach the listener to
+     * @param movie The movie to pass to the click listener
+     */
+    private void setupClickListener(@NonNull MovieViewHolder holder, @NonNull MediaResponse movie) {
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onMovieClick(movie);
+            }
+        });
+    }
+
+
+    @Override
+    public int getItemCount() {
+        return movies.size();
+    }
+
+
+    /**
+     * Interface for handling movie click events.
+     */
+    public interface OnMovieClickListener {
+        void onMovieClick(MediaResponse movie);
+    }
+
+
+    /**
+     * ViewHolder class for movie items.
+     */
+    static class MovieViewHolder extends RecyclerView.ViewHolder {
+        private final ImageView posterImage;
+
+        MovieViewHolder(@NonNull View itemView) {
+            super(itemView);
+            posterImage = itemView.findViewById(R.id.movie_poster);
+        }
+    }
+}
