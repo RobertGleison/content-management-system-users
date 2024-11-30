@@ -1,5 +1,6 @@
 package com.example.netflixplus.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.netflixplus.R;
+import com.example.netflixplus.activities.MovieDetailsActivity;
 import com.example.netflixplus.entities.MediaResponse;
 import com.example.netflixplus.retrofitAPI.RetrofitClient;
 import com.example.netflixplus.utils.MovieAdapter;
@@ -224,6 +226,14 @@ public class HomeFragment extends Fragment implements MovieAdapter.OnMovieClickL
 
     @Override
     public void onMovieClick(MediaResponse media) {
-        Toast.makeText(requireContext(), "Selected: " + media.getTitle(), Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(requireContext(), MovieDetailsActivity.class);
+        intent.putExtra("title", media.getTitle());
+        intent.putExtra("description", media.getDescription());
+        intent.putExtra("genre", media.getGenre());
+        intent.putExtra("year", media.getYear());
+        intent.putExtra("publisher", media.getPublisher());
+        intent.putExtra("duration", media.getDuration());
+        intent.putExtra("thumbnail", media.getThumbnail());
+        startActivity(intent);
     }
 }

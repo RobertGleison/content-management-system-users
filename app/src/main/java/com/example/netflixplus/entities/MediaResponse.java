@@ -66,6 +66,10 @@ public class MediaResponse implements Serializable {
         return description;
     }
 
+    public String getPublisher() {
+        return publisher;
+    }
+
     public String getGenre() {
         return genre;
     }
