@@ -14,6 +14,7 @@ import androidx.media3.common.util.UnstableApi;
 import com.bumptech.glide.Glide;
 import com.example.netflixplus.R;
 
+import com.example.netflixplus.utils.ImageLoader;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 
 public class MovieDetailsActivity extends AppCompatActivity {
@@ -23,7 +24,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
     private boolean isHighQuality = true; // Default to high quality
 
     // Store values as class fields
-    private String title, description, genre, publisher, thumbnail;
+    private String title, description, genre, publisher, thumbnailUrl;
     private int year, duration;
 
     @Override
@@ -38,7 +39,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         year = getIntent().getIntExtra("year", 0); // 0 as default value
         publisher = getIntent().getStringExtra("publisher");
         duration = getIntent().getIntExtra("duration", 0); // 0 as default value
-        thumbnail = getIntent().getStringExtra("thumbnail");
+        thumbnailUrl = getIntent().getStringExtra("thumbnailUrl");
 
         // Validate required data
         if (title == null || description == null) {
@@ -111,11 +112,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
             durationView.setText(String.format("%d min", duration));
         }
 
-        if (thumbnail != null) {
-            Glide.with(this)
-                    .load(thumbnail)
-                    .centerCrop()
-                    .into(thumbnailView);
+        if (thumbnailUrl != null) {
+            ImageLoader.loadMovieThumbnail(thumbnailUrl, thumbnailView);
         }
     }
 

@@ -17,6 +17,7 @@ import com.example.netflixplus.R;
 import com.example.netflixplus.activities.MovieDetailsActivity;
 import com.example.netflixplus.entities.MediaResponse;
 import com.example.netflixplus.retrofitAPI.RetrofitClient;
+import com.example.netflixplus.utils.ImageLoader;
 import com.example.netflixplus.utils.MovieAdapter;
 
 import java.util.ArrayList;
@@ -160,10 +161,7 @@ public class HomeFragment extends Fragment implements MovieAdapter.OnMovieClickL
         // Update featured movie
         MediaResponse featuredMovie = movies.get(0);
         featuredMovieTitle.setText(featuredMovie.getTitle());
-//        Glide.with(requireContext())
-//                .load(featuredMovie.getThumbnail())
-//                .centerCrop()
-//                .into(featuredMovieImage);
+        ImageLoader.loadMovieThumbnail(requireContext(), featuredMovie.getFilename(), featuredMovieImage);
 
         // Filter movies by genre
         List<MediaResponse> dramaMovies = new ArrayList<>();
@@ -233,6 +231,7 @@ public class HomeFragment extends Fragment implements MovieAdapter.OnMovieClickL
         intent.putExtra("year", media.getYear());
         intent.putExtra("publisher", media.getPublisher());
         intent.putExtra("duration", media.getDuration());
+        intent.putExtra("thumbnailUrl", media.getFilename());
         startActivity(intent);
     }
 }

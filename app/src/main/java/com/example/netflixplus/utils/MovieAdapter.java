@@ -81,17 +81,11 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
      */
     private void loadMovieThumbnail(@NonNull MovieViewHolder holder, @NonNull MediaResponse movie) {
         // Construct the GCP Storage URL
-        // Format: https://storage.googleapis.com/BUCKET_NAME/OBJECT_NAME
         String objectName = String.format("movies/%s/thumbnail.jpg", movie.getId());
         String imageUrl = String.format("%s/%s/%s", GCP_STORAGE_URL, BUCKET_NAME, objectName);
 
-        // Load image using Glide
-        Glide.with(holder.itemView.getContext())
-                .load(imageUrl)
-                .placeholder(R.drawable.placeholder_thumbnail) // Add a placeholder drawable
-                .error(R.drawable.placeholder_thumbnail) // Add an error drawable
-                .centerCrop()
-                .into(holder.posterImage);
+        // Use the ImageLoader utility with the ImageView from the ViewHolder
+        ImageLoader.loadMovieThumbnail(imageUrl, holder.posterImage);
     }
 
 
