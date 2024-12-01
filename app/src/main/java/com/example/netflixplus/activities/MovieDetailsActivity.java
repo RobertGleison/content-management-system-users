@@ -1,32 +1,26 @@
 // MovieDetailsActivity.java
 package com.example.netflixplus.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.media3.common.MediaItem;
 import androidx.media3.common.util.UnstableApi;
-import androidx.media3.datasource.DefaultHttpDataSource;
-import androidx.media3.exoplayer.ExoPlayer;
-import androidx.media3.exoplayer.hls.HlsMediaSource;
-import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
-import androidx.media3.exoplayer.source.MediaSource;
-import androidx.media3.ui.PlayerView;
 
 import com.bumptech.glide.Glide;
 import com.example.netflixplus.R;
-import com.example.netflixplus.entities.MediaResponse;
+
+import com.google.android.material.button.MaterialButtonToggleGroup;
 
 public class MovieDetailsActivity extends AppCompatActivity {
-    private PlayerView playerView;
-    private ExoPlayer player;
     private ImageView thumbnailView;
     private TextView titleView, descriptionView, genreView, yearView, publisherView, durationView;
+    private MaterialButtonToggleGroup qualityToggleGroup;
+    private boolean isHighQuality = true; // Default to high quality
 
     // Store values as class fields
     private String title, description, genre, publisher, thumbnail;
@@ -56,10 +50,10 @@ public class MovieDetailsActivity extends AppCompatActivity {
         initializeViews();
         setupPlayer();
         populateUI();
+        setupQualityToggle();
     }
 
     private void initializeViews() {
-        playerView = findViewById(R.id.view);
         thumbnailView = findViewById(R.id.movie_thumbnail);
         titleView = findViewById(R.id.movie_title);
         descriptionView = findViewById(R.id.movie_description);
@@ -67,35 +61,35 @@ public class MovieDetailsActivity extends AppCompatActivity {
         yearView = findViewById(R.id.movie_year);
         publisherView = findViewById(R.id.movie_publisher);
         durationView = findViewById(R.id.movie_duration);
+        qualityToggleGroup = findViewById(R.id.quality_toggle_group);
 
-        findViewById(R.id.play_button).setOnClickListener(v -> startPlayback());
+        findViewById(R.id.play_button).setOnClickListener(v -> {
+            Intent intent = new Intent(MovieDetailsActivity.this, VideoPlayerActivity.class);
+            // Pass the quality flag to VideoPlayerActivity
+            intent.putExtra("isHighQuality", isHighQuality);
+            startActivity(intent);
+        });
+    }
+
+    private void setupQualityToggle() {
+        // Set default selection to high quality
+        qualityToggleGroup.check(R.id.high_quality_button);
+
+        qualityToggleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+            if (isChecked) {
+                if (checkedId == R.id.high_quality_button) {
+                    isHighQuality = true;
+                    Toast.makeText(this, "HD Quality Selected", Toast.LENGTH_SHORT).show();
+                } else if (checkedId == R.id.low_quality_button) {
+                    isHighQuality = false;
+                    Toast.makeText(this, "SD Quality Selected", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     @OptIn(markerClass = UnstableApi.class)
     private void setupPlayer() {
-        // Create a data source factory
-        DefaultHttpDataSource.Factory httpDataSourceFactory = new DefaultHttpDataSource.Factory();
-
-        // Create HLS media source factory
-        HlsMediaSource.Factory hlsMediaSourceFactory = new HlsMediaSource.Factory(httpDataSourceFactory);
-
-        // Create ExoPlayer with the factories
-        ExoPlayer.Builder builder = new ExoPlayer.Builder(this)
-                .setMediaSourceFactory(
-                        new DefaultMediaSourceFactory(this)
-                                .setDataSourceFactory(httpDataSourceFactory)
-                );
-
-        player = builder.build();
-        playerView.setPlayer(player);
-
-        // Create media source
-        MediaSource mediaSource = hlsMediaSourceFactory
-                .createMediaSource(MediaItem.fromUri("http://34.141.197.84/live/output.m3u8"));
-
-        // Set the media source and prepare
-        player.setMediaSource(mediaSource);
-        player.prepare();
     }
 
     private void populateUI() {
@@ -125,18 +119,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
         }
     }
 
-    private void startPlayback() {
-        thumbnailView.setVisibility(View.GONE);
-        playerView.setVisibility(View.VISIBLE);
-        player.play();
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (player != null) {
-            player.release();
-            player = null;
-        }
     }
 }

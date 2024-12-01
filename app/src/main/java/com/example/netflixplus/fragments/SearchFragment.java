@@ -164,7 +164,6 @@ public class SearchFragment extends Fragment implements MovieAdapter.OnMovieClic
         intent.putExtra("year", media.getYear());
         intent.putExtra("publisher", media.getPublisher());
         intent.putExtra("duration", media.getDuration());
-        intent.putExtra("thumbnail", media.getThumbnail());
         startActivity(intent);
     }
 

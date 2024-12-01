@@ -20,7 +20,6 @@ public class MediaResponse implements Serializable {
     private String filename;
     private Map<String, String> bucketPaths;
     private LocalDateTime uploadTimestamp;
-    private byte[] thumbnail;
 
     public MediaResponse(UUID id, String title, String description, String genre, Integer year, String publisher, Integer duration, String filename, Map<String, String> bucketPaths, LocalDateTime uploadTimestamp, byte[] thumbnail) {
         this.id = id;
@@ -33,7 +32,6 @@ public class MediaResponse implements Serializable {
         this.filename = filename;
         this.bucketPaths = bucketPaths;
         this.uploadTimestamp = uploadTimestamp;
-        this.thumbnail = thumbnail;
     }
 
     public MediaResponse(UUID id, String title, String description, String genre, Integer year, String publisher, Integer duration, String filename, Map<String, String> bucketPaths, LocalDateTime uploadTimestamp) {
@@ -47,7 +45,6 @@ public class MediaResponse implements Serializable {
         this.filename = filename;
         this.bucketPaths = bucketPaths;
         this.uploadTimestamp = uploadTimestamp;
-        this.thumbnail = null;
     }
 
     public UUID getId() {
@@ -60,6 +57,9 @@ public class MediaResponse implements Serializable {
 
     public String getTitle() {
         return title;
+    }
+    public String getFilename() {
+        return filename;
     }
 
     public String getDescription() {
@@ -82,13 +82,7 @@ public class MediaResponse implements Serializable {
         return duration;
     }
 
-    public void setThumbnail(byte[] thumbnail) {
-        this.thumbnail = thumbnail;
-    }
 
-    public byte[] getThumbnail() {
-        return thumbnail;
-    }
 }
 
 

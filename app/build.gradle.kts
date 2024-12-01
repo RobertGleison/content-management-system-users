@@ -51,11 +51,33 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "META-INF/INDEX.LIST"
+            excludes += "google/protobuf/type.proto"
+            excludes += "google/protobuf/timestamp.proto"
+            excludes += "google/protobuf/duration.proto"
+            excludes += "google/protobuf/empty.proto"
+            excludes += "google/protobuf/struct.proto"
+            excludes += "google/protobuf/wrappers.proto"
+            excludes += "google/protobuf/any.proto"
+            excludes += "google/protobuf/api.proto"
+            excludes += "google/protobuf/field_mask.proto"
+            excludes += "google/protobuf/source_context.proto"
+            excludes += "google/protobuf/descriptor.proto"
         }
     }
 }
 
 dependencies {
+    constraints {
+        implementation("com.google.protobuf:protobuf-javalite:3.22.3") {
+            because("Firebase uses protobuf-javalite")
+        }
+    }
+
+    implementation("com.google.cloud:google-cloud-storage:2.22.0") {
+        exclude(group = "com.google.protobuf", module = "protobuf-java")
+    }
+
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.ui)
     implementation(libs.androidx.media3.exoplayer.hls)
@@ -80,7 +102,6 @@ dependencies {
     // Lifecycle Components
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
-
     // Compose
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
@@ -89,6 +110,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.media3.exoplayer.hls)
+    implementation(libs.cronet.embedded)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 

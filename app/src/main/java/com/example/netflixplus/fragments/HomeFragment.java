@@ -160,10 +160,10 @@ public class HomeFragment extends Fragment implements MovieAdapter.OnMovieClickL
         // Update featured movie
         MediaResponse featuredMovie = movies.get(0);
         featuredMovieTitle.setText(featuredMovie.getTitle());
-        Glide.with(requireContext())
-                .load(featuredMovie.getThumbnail())
-                .centerCrop()
-                .into(featuredMovieImage);
+//        Glide.with(requireContext())
+//                .load(featuredMovie.getThumbnail())
+//                .centerCrop()
+//                .into(featuredMovieImage);
 
         // Filter movies by genre
         List<MediaResponse> dramaMovies = new ArrayList<>();
@@ -233,7 +233,6 @@ public class HomeFragment extends Fragment implements MovieAdapter.OnMovieClickL
         intent.putExtra("year", media.getYear());
         intent.putExtra("publisher", media.getPublisher());
         intent.putExtra("duration", media.getDuration());
-        intent.putExtra("thumbnail", media.getThumbnail());
         startActivity(intent);
     }
 }

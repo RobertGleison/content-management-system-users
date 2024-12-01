@@ -147,10 +147,10 @@ public class DownloadsFragment extends Fragment {
                 title.setText(media.getTitle());
                 info.setText(String.format("%s • %s", media.getGenre(), "1.2 GB"));
 
-                Glide.with(itemView.getContext())
-                        .load(media.getThumbnail())
-                        .centerCrop()
-                        .into(thumbnail);
+//                Glide.with(itemView.getContext())
+//                        .load(media.getThumbnail())
+//                        .centerCrop()
+//                        .into(thumbnail);
 
                 moreOptions.setOnClickListener(v -> {
                     // Show options popup (delete, share, etc.)

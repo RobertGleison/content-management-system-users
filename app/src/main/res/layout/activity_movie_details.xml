@@ -8,8 +8,10 @@
     <androidx.media3.ui.PlayerView
         android:id="@+id/view"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="match_parent"
         android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:surface_type="texture_view" />
 
@@ -28,6 +30,34 @@
         app:layout_constraintEnd_toEndOf="@id/movie_thumbnail"
         app:layout_constraintStart_toStartOf="@id/movie_thumbnail"
         app:layout_constraintTop_toTopOf="@id/movie_thumbnail" />
+
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/quality_toggle_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:singleSelection="true"
+        app:layout_constraintTop_toBottomOf="@id/play_button"
+        app:layout_constraintStart_toStartOf="@id/movie_thumbnail"
+        app:layout_constraintEnd_toEndOf="@id/movie_thumbnail">
+
+        <Button
+            android:id="@+id/high_quality_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="High"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:textColor="@android:color/white" />
+
+        <Button
+            android:id="@+id/low_quality_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Low"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:textColor="@android:color/white" />
+
+    </com.google.android.material.button.MaterialButtonToggleGroup>
 
     <TextView
         android:id="@+id/movie_title"
