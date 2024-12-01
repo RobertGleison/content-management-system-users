@@ -8,9 +8,8 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.example.netflixplus.R;
-import com.example.netflixplus.entities.MediaResponse;
+import com.example.netflixplus.entities.MediaResponseDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,11 +20,10 @@ import java.util.List;
  * loading movie thumbnails using Glide, and managing click events.
  */
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder> {
-    private List<MediaResponse> movies;
+    private List<MediaResponseDTO> movies;
     private final OnMovieClickListener listener;
     private static final String PROJECT_ID = "netflixplus-438015";
     private static final String BUCKET_NAME = "netflixplus-library-cc2024";
-    private static final String GCP_STORAGE_URL = "https://storage.googleapis.com";
 
     /**
      * Constructs a new MovieAdapter with a click listener.
@@ -41,7 +39,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
      * Updates the adapter's movie list and refreshes the view.
      * @param movies New list of movies to display
      */
-    public void setMovies(@NonNull List<MediaResponse> movies) {
+    public void setMovies(@NonNull List<MediaResponseDTO> movies) {
         this.movies = new ArrayList<>(movies); // Create defensive copy
         notifyDataSetChanged();
     }
@@ -68,7 +66,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
     @Override
     public void onBindViewHolder(@NonNull MovieViewHolder holder, int position) {
-        MediaResponse movie = movies.get(position);
+        MediaResponseDTO movie = movies.get(position);
         loadMovieThumbnail(holder, movie);
         setupClickListener(holder, movie);
     }
@@ -79,13 +77,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
      * @param holder The ViewHolder to load the image into
      * @param movie The movie containing the thumbnail URL
      */
-    private void loadMovieThumbnail(@NonNull MovieViewHolder holder, @NonNull MediaResponse movie) {
-        // Construct the GCP Storage URL
-        String objectName = String.format("movies/%s/thumbnail.jpg", movie.getId());
-        String imageUrl = String.format("%s/%s/%s", GCP_STORAGE_URL, BUCKET_NAME, objectName);
-
+    private void loadMovieThumbnail(@NonNull MovieViewHolder holder, @NonNull MediaResponseDTO movie) {
         // Use the ImageLoader utility with the ImageView from the ViewHolder
-        ImageLoader.loadMovieThumbnail(imageUrl, holder.posterImage);
+        ImageLoader.loadMovieThumbnail(movie.getBucketPaths().get("thumbnail"), holder.posterImage);
     }
 
 
@@ -94,7 +88,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
      * @param holder The ViewHolder to attach the listener to
      * @param movie The movie to pass to the click listener
      */
-    private void setupClickListener(@NonNull MovieViewHolder holder, @NonNull MediaResponse movie) {
+    private void setupClickListener(@NonNull MovieViewHolder holder, @NonNull MediaResponseDTO movie) {
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onMovieClick(movie);
@@ -113,7 +107,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
      * Interface for handling movie click events.
      */
     public interface OnMovieClickListener {
-        void onMovieClick(MediaResponse movie);
+        void onMovieClick(MediaResponseDTO movie);
     }
 
 

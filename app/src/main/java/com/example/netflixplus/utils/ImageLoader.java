@@ -15,6 +15,7 @@ public class ImageLoader {
         if (thumbnailUrl != null && !thumbnailUrl.isEmpty()) {
             Glide.with(context)
                     .load(thumbnailUrl)
+//                    .load("https://storage.googleapis.com/netflixplus-library-cc2024/testeuhuu/thumbnail_testeuhuu.heic")
                     .centerCrop()
                     .placeholder(R.drawable.placeholder_thumbnail)
                     .error(R.drawable.placeholder_thumbnail)
@@ -32,6 +33,7 @@ public class ImageLoader {
         if (thumbnailUrl != null && !thumbnailUrl.isEmpty()) {
             Glide.with(imageView.getContext())
                     .load(thumbnailUrl)
+//                    .load("https://storage.googleapis.com/netflixplus-library-cc2024/testeuhuu/thumbnail_testeuhuu.heic")
                     .centerCrop()
                     .placeholder(R.drawable.placeholder_thumbnail)
                     .error(R.drawable.placeholder_thumbnail)

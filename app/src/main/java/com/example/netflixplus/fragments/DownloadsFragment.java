@@ -17,9 +17,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.example.netflixplus.R;
-import com.example.netflixplus.entities.MediaResponse;
+import com.example.netflixplus.entities.MediaResponseDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,16 +71,16 @@ public class DownloadsFragment extends Fragment {
 
     private void loadDownloads() {
         // Simulate loading downloads - replace with actual local storage query
-        List<MediaResponse> downloads = getDownloadedMovies();
+        List<MediaResponseDTO> downloads = getDownloadedMovies();
         updateUI(downloads);
     }
 
-    private List<MediaResponse> getDownloadedMovies() {
+    private List<MediaResponseDTO> getDownloadedMovies() {
         // TODO: Replace with actual local storage query
         return new ArrayList<>(); // Return empty list for now
     }
 
-    private void updateUI(List<MediaResponse> downloads) {
+    private void updateUI(List<MediaResponseDTO> downloads) {
         if (downloads.isEmpty()) {
             showEmptyState();
         } else {
@@ -94,14 +93,14 @@ public class DownloadsFragment extends Fragment {
         emptyStateContainer.setVisibility(View.VISIBLE);
     }
 
-    private void showDownloads(List<MediaResponse> downloads) {
+    private void showDownloads(List<MediaResponseDTO> downloads) {
         emptyStateContainer.setVisibility(View.GONE);
         downloadsRecyclerView.setVisibility(View.VISIBLE);
         downloadAdapter.setDownloads(downloads);
     }
 
     private static class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.DownloadViewHolder> {
-        private List<MediaResponse> downloads = new ArrayList<>();
+        private List<MediaResponseDTO> downloads = new ArrayList<>();
 
         @NonNull
         @Override
@@ -113,7 +112,7 @@ public class DownloadsFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(@NonNull DownloadViewHolder holder, int position) {
-            MediaResponse media = downloads.get(position);
+            MediaResponseDTO media = downloads.get(position);
             holder.bind(media);
         }
 
@@ -122,7 +121,7 @@ public class DownloadsFragment extends Fragment {
             return downloads.size();
         }
 
-        public void setDownloads(List<MediaResponse> downloads) {
+        public void setDownloads(List<MediaResponseDTO> downloads) {
             this.downloads = downloads;
             notifyDataSetChanged();
         }
@@ -143,7 +142,7 @@ public class DownloadsFragment extends Fragment {
                 downloadProgress = itemView.findViewById(R.id.download_progress);
             }
 
-            public void bind(MediaResponse media) {
+            public void bind(MediaResponseDTO media) {
                 title.setText(media.getTitle());
                 info.setText(String.format("%s • %s", media.getGenre(), "1.2 GB"));
 
@@ -158,7 +157,7 @@ public class DownloadsFragment extends Fragment {
                 });
             }
 
-            private void showOptionsPopup(View anchor, MediaResponse media) {
+            private void showOptionsPopup(View anchor, MediaResponseDTO media) {
                 PopupMenu popup = new PopupMenu(anchor.getContext(), anchor);
                 popup.getMenuInflater().inflate(R.menu.download_options_menu, popup.getMenu());
                 popup.setOnMenuItemClickListener(item -> {

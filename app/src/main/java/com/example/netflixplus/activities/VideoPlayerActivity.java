@@ -15,6 +15,8 @@ import androidx.media3.ui.PlayerView;
 
 import com.example.netflixplus.R;
 
+import java.util.Map;
+
 public class VideoPlayerActivity extends AppCompatActivity {
     private ExoPlayer player;
     private static final String POSITION_PREFERENCE = "video_position";
@@ -26,27 +28,25 @@ public class VideoPlayerActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_video_player);
         boolean isHighQuality = getIntent().getBooleanExtra("isHighQuality", true); // true as default
-
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.videoPlayerLayout), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+        String id = getIntent().getStringExtra("id"); // true as default
+        Map<String,String> mediaUrls = (Map<String, String>) getIntent().getSerializableExtra("mediaUrls");
 
         PlayerView playerView = findViewById(R.id.videoPlayer);
-        playerView.setVisibility(View.VISIBLE);
 
         // Get saved position
-        long savedPosition = getSavedPosition("CharlieChaplin");
+        long savedPosition = getSavedPosition(id);
 
-        player = buildMoviePlayer("CharlieChaplin", false, savedPosition);
+        player = buildMoviePlayer(mediaUrls, isHighQuality, savedPosition);
         playerView.setPlayer(player);
     }
 
-    protected ExoPlayer buildMoviePlayer(String movieName, boolean lowQuality, long startPosition) {
+    protected ExoPlayer buildMoviePlayer(Map<String, String> mediaUrls, boolean isHighQuality, long startPosition) {
         player = new ExoPlayer.Builder(getApplicationContext()).build();
-        player.setMediaItem(MediaItem.fromUri("http://34.141.197.84/live/output.m3u8"));
+        String selectedUrl = isHighQuality ? mediaUrls.get("HD_HLS") : mediaUrls.get("LD_HLS");
+
+        player.setMediaItem(MediaItem.fromUri("selectedUrl"));
+//        player.setMediaItem(MediaItem.fromUri("http://34.141.197.84/live/output.m3u8"));
+
         player.prepare();
         player.seekTo(startPosition);  // Seek to saved position
         player.play();

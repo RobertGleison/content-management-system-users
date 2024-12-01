@@ -1,7 +1,7 @@
 package com.example.netflixplus.retrofitAPI;
 
 
-import com.example.netflixplus.entities.MediaResponse;
+import com.example.netflixplus.entities.MediaResponseDTO;
 
 import java.util.List;
 import java.util.UUID;
@@ -11,7 +11,6 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 
 import retrofit2.Call;
-import retrofit2.http.Body;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.GET;
@@ -40,25 +39,25 @@ public interface RetrofitInterface {
 
     @GET("media")
     @Headers({"Accept: application/json", "Content-Type: application/json"})
-    Call<List<MediaResponse>> getAllMedia();
+    Call<List<MediaResponseDTO>> getAllMedia();
 
 
 
     @GET("media/genre/{genre}")
     @Headers({"Accept: application/json", "Content-Type: application/json"})
-    Call<List<MediaResponse>> getMediaByGenre(@Path("genre") String genre);
+    Call<List<MediaResponseDTO>> getMediaByGenre(@Path("genre") String genre);
 
 
 
     @GET("media/title/{title}")
     @Headers({"Accept: application/json", "Content-Type: application/json"})
-    Call<List<MediaResponse>> getMediaByTitle(@Path("title") String title);
+    Call<List<MediaResponseDTO>> getMediaByTitle(@Path("title") String title);
 
 
 
     @GET("media/{id}")
     @Headers({"Accept: application/json", "Content-Type: application/json"})
-    Call<MediaResponse> getMediaById(@Path("id") UUID id);
+    Call<MediaResponseDTO> getMediaById(@Path("id") UUID id);
 
 
 

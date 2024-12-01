@@ -16,16 +16,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.netflixplus.R;
 import com.example.netflixplus.activities.MovieDetailsActivity;
-import com.example.netflixplus.entities.MediaResponse;
+import com.example.netflixplus.entities.MediaResponseDTO;
 import com.example.netflixplus.retrofitAPI.RetrofitClient;
 import com.example.netflixplus.utils.MovieAdapter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.PublishSubject;
@@ -39,7 +39,7 @@ public class SearchFragment extends Fragment implements MovieAdapter.OnMovieClic
     private RecyclerView searchResultsRecyclerView;
     private View emptyStateContainer;
     private MovieAdapter searchAdapter;
-    private List<MediaResponse> allMovies = new ArrayList<>();
+    private List<MediaResponseDTO> allMovies = new ArrayList<>();
     private final CompositeDisposable disposables = new CompositeDisposable();
     private final PublishSubject<String> searchSubject = PublishSubject.create();
 
@@ -93,9 +93,9 @@ public class SearchFragment extends Fragment implements MovieAdapter.OnMovieClic
         RetrofitClient.getInstance()
                 .getApi()
                 .getAllMedia()
-                .enqueue(new Callback<List<MediaResponse>>() {
+                .enqueue(new Callback<List<MediaResponseDTO>>() {
                     @Override
-                    public void onResponse(Call<List<MediaResponse>> call, Response<List<MediaResponse>> response) {
+                    public void onResponse(Call<List<MediaResponseDTO>> call, Response<List<MediaResponseDTO>> response) {
                         if (response.isSuccessful() && response.body() != null) {
                             allMovies = response.body();
                         } else {
@@ -104,7 +104,7 @@ public class SearchFragment extends Fragment implements MovieAdapter.OnMovieClic
                     }
 
                     @Override
-                    public void onFailure(Call<List<MediaResponse>> call, Throwable t) {
+                    public void onFailure(Call<List<MediaResponseDTO>> call, Throwable t) {
                         showError("Network Error: " + t.getMessage());
                     }
                 });
@@ -116,11 +116,11 @@ public class SearchFragment extends Fragment implements MovieAdapter.OnMovieClic
             return;
         }
 
-        List<MediaResponse> searchResults = new ArrayList<>();
+        List<MediaResponseDTO> searchResults = new ArrayList<>();
         String lowercaseQuery = query.toLowerCase();
 
         // Search in title and genre
-        for (MediaResponse movie : allMovies) {
+        for (MediaResponseDTO movie : allMovies) {
             if (movie.getTitle().toLowerCase().contains(lowercaseQuery) ||
                     (movie.getGenre() != null && movie.getGenre().toLowerCase().contains(lowercaseQuery))) {
                 searchResults.add(movie);
@@ -130,7 +130,7 @@ public class SearchFragment extends Fragment implements MovieAdapter.OnMovieClic
         updateSearchResults(searchResults);
     }
 
-    private void updateSearchResults(List<MediaResponse> results) {
+    private void updateSearchResults(List<MediaResponseDTO> results) {
         if (results.isEmpty()) {
             showEmptyState();
         } else {
@@ -156,7 +156,7 @@ public class SearchFragment extends Fragment implements MovieAdapter.OnMovieClic
     }
 
     @Override
-    public void onMovieClick(MediaResponse media) {
+    public void onMovieClick(MediaResponseDTO media) {
         Intent intent = new Intent(requireContext(), MovieDetailsActivity.class);
         intent.putExtra("title", media.getTitle());
         intent.putExtra("description", media.getDescription());
@@ -164,6 +164,7 @@ public class SearchFragment extends Fragment implements MovieAdapter.OnMovieClic
         intent.putExtra("year", media.getYear());
         intent.putExtra("publisher", media.getPublisher());
         intent.putExtra("duration", media.getDuration());
+        intent.putExtra("mediaUrls", new HashMap<>(media.getBucketPaths()));
         startActivity(intent);
     }
 

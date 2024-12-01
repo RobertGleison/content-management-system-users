@@ -17,6 +17,9 @@ import com.example.netflixplus.R;
 import com.example.netflixplus.utils.ImageLoader;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MovieDetailsActivity extends AppCompatActivity {
     private ImageView thumbnailView;
     private TextView titleView, descriptionView, genreView, yearView, publisherView, durationView;
@@ -26,6 +29,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
     // Store values as class fields
     private String title, description, genre, publisher, thumbnailUrl;
     private int year, duration;
+    private String id;
+    private Map<String, String> mediaUrls;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,13 +38,15 @@ public class MovieDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_movie_details);
 
         // Get data from intent
+        id = getIntent().getStringExtra("id");
         title = getIntent().getStringExtra("title");
         description = getIntent().getStringExtra("description");
         genre = getIntent().getStringExtra("genre");
         year = getIntent().getIntExtra("year", 0); // 0 as default value
         publisher = getIntent().getStringExtra("publisher");
         duration = getIntent().getIntExtra("duration", 0); // 0 as default value
-        thumbnailUrl = getIntent().getStringExtra("thumbnailUrl");
+        mediaUrls = (Map<String, String>) getIntent().getSerializableExtra("mediaUrls");
+        thumbnailUrl = mediaUrls.get("thumbnailUrl");
 
         // Validate required data
         if (title == null || description == null) {
@@ -68,6 +75,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
             Intent intent = new Intent(MovieDetailsActivity.this, VideoPlayerActivity.class);
             // Pass the quality flag to VideoPlayerActivity
             intent.putExtra("isHighQuality", isHighQuality);
+            intent.putExtra("id", id);
+            intent.putExtra("mediaUrls", new HashMap<>(mediaUrls));
             startActivity(intent);
         });
     }

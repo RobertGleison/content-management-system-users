@@ -7,9 +7,8 @@ import java.util.Map;
 import java.util.UUID;
 
 
-public class MediaResponse implements Serializable {
+public class MediaResponseDTO implements Serializable {
     private static final long serialVersionUID = 1L;
-
     private UUID id;
     private String title;
     private String description;
@@ -17,11 +16,10 @@ public class MediaResponse implements Serializable {
     private Integer year;
     private String publisher;
     private Integer duration;
-    private String filename;
     private Map<String, String> bucketPaths;
     private LocalDateTime uploadTimestamp;
 
-    public MediaResponse(UUID id, String title, String description, String genre, Integer year, String publisher, Integer duration, String filename, Map<String, String> bucketPaths, LocalDateTime uploadTimestamp, byte[] thumbnail) {
+    public MediaResponseDTO(UUID id, String title, String description, String genre, Integer year, String publisher, Integer duration, Map<String, String> bucketPaths, LocalDateTime uploadTimestamp, byte[] thumbnail) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -29,12 +27,11 @@ public class MediaResponse implements Serializable {
         this.year = year;
         this.publisher = publisher;
         this.duration = duration;
-        this.filename = filename;
         this.bucketPaths = bucketPaths;
         this.uploadTimestamp = uploadTimestamp;
     }
 
-    public MediaResponse(UUID id, String title, String description, String genre, Integer year, String publisher, Integer duration, String filename, Map<String, String> bucketPaths, LocalDateTime uploadTimestamp) {
+    public MediaResponseDTO(UUID id, String title, String description, String genre, Integer year, String publisher, Integer duration, Map<String, String> bucketPaths, LocalDateTime uploadTimestamp) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -42,7 +39,6 @@ public class MediaResponse implements Serializable {
         this.year = year;
         this.publisher = publisher;
         this.duration = duration;
-        this.filename = filename;
         this.bucketPaths = bucketPaths;
         this.uploadTimestamp = uploadTimestamp;
     }
@@ -58,8 +54,10 @@ public class MediaResponse implements Serializable {
     public String getTitle() {
         return title;
     }
-    public String getFilename() {
-        return filename;
+
+
+    public Map<String, String> getBucketPaths(){
+        return  bucketPaths;
     }
 
     public String getDescription() {

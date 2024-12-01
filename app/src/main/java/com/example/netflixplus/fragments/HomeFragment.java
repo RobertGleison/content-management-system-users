@@ -12,15 +12,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.example.netflixplus.R;
 import com.example.netflixplus.activities.MovieDetailsActivity;
-import com.example.netflixplus.entities.MediaResponse;
+import com.example.netflixplus.entities.MediaResponseDTO;
 import com.example.netflixplus.retrofitAPI.RetrofitClient;
 import com.example.netflixplus.utils.ImageLoader;
 import com.example.netflixplus.utils.MovieAdapter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import retrofit2.Call;
@@ -130,9 +130,9 @@ public class HomeFragment extends Fragment implements MovieAdapter.OnMovieClickL
         RetrofitClient.getInstance()
                 .getApi()
                 .getAllMedia()
-                .enqueue(new Callback<List<MediaResponse>>() {
+                .enqueue(new Callback<List<MediaResponseDTO>>() {
                     @Override
-                    public void onResponse(Call<List<MediaResponse>> call, Response<List<MediaResponse>> response) {
+                    public void onResponse(Call<List<MediaResponseDTO>> call, Response<List<MediaResponseDTO>> response) {
                         if (response.isSuccessful() && response.body() != null) {
                             updateUI(response.body());
                         } else {
@@ -147,7 +147,7 @@ public class HomeFragment extends Fragment implements MovieAdapter.OnMovieClickL
                     }
 
                     @Override
-                    public void onFailure(Call<List<MediaResponse>> call, Throwable t) {
+                    public void onFailure(Call<List<MediaResponseDTO>> call, Throwable t) {
                         showError("Network Error: " + t.getMessage());
                         t.printStackTrace();
                     }
@@ -155,26 +155,26 @@ public class HomeFragment extends Fragment implements MovieAdapter.OnMovieClickL
     }
 
 
-    private void updateUI(List<MediaResponse> movies) {
+    private void updateUI(List<MediaResponseDTO> movies) {
         if (movies.isEmpty()) return;
 
         // Update featured movie
-        MediaResponse featuredMovie = movies.get(0);
+        MediaResponseDTO featuredMovie = movies.get(0);
         featuredMovieTitle.setText(featuredMovie.getTitle());
-        ImageLoader.loadMovieThumbnail(requireContext(), featuredMovie.getFilename(), featuredMovieImage);
+        ImageLoader.loadMovieThumbnail(requireContext(), featuredMovie.getBucketPaths().get("thumbnail"), featuredMovieImage);
 
         // Filter movies by genre
-        List<MediaResponse> dramaMovies = new ArrayList<>();
-        List<MediaResponse> animationMovies = new ArrayList<>();
-        List<MediaResponse> fictionMovies = new ArrayList<>();
-        List<MediaResponse> actionMovies = new ArrayList<>();
-        List<MediaResponse> comedyMovies = new ArrayList<>();
-        List<MediaResponse> fantasyMovies = new ArrayList<>();
-        List<MediaResponse> horrorMovies = new ArrayList<>();
-        List<MediaResponse> trendingMovies = new ArrayList<>();
-        List<MediaResponse> popularMovies = new ArrayList<>();
+        List<MediaResponseDTO> dramaMovies = new ArrayList<>();
+        List<MediaResponseDTO> animationMovies = new ArrayList<>();
+        List<MediaResponseDTO> fictionMovies = new ArrayList<>();
+        List<MediaResponseDTO> actionMovies = new ArrayList<>();
+        List<MediaResponseDTO> comedyMovies = new ArrayList<>();
+        List<MediaResponseDTO> fantasyMovies = new ArrayList<>();
+        List<MediaResponseDTO> horrorMovies = new ArrayList<>();
+        List<MediaResponseDTO> trendingMovies = new ArrayList<>();
+        List<MediaResponseDTO> popularMovies = new ArrayList<>();
 
-        for (MediaResponse movie : movies) {
+        for (MediaResponseDTO movie : movies) {
             String genre = movie.getGenre();
             if (genre != null) {
                 if (genre.equalsIgnoreCase("Drama")) {
@@ -223,7 +223,7 @@ public class HomeFragment extends Fragment implements MovieAdapter.OnMovieClickL
 
 
     @Override
-    public void onMovieClick(MediaResponse media) {
+    public void onMovieClick(MediaResponseDTO media) {
         Intent intent = new Intent(requireContext(), MovieDetailsActivity.class);
         intent.putExtra("title", media.getTitle());
         intent.putExtra("description", media.getDescription());
@@ -231,7 +231,7 @@ public class HomeFragment extends Fragment implements MovieAdapter.OnMovieClickL
         intent.putExtra("year", media.getYear());
         intent.putExtra("publisher", media.getPublisher());
         intent.putExtra("duration", media.getDuration());
-        intent.putExtra("thumbnailUrl", media.getFilename());
+        intent.putExtra("mediaUrls", new HashMap<>(media.getBucketPaths()));
         startActivity(intent);
     }
 }
