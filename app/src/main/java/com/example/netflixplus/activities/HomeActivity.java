@@ -50,6 +50,7 @@ public class HomeActivity extends AppCompatActivity {
      * Initializes the UI components and sets up navigation.
      */
     private void initializeUI() {
+        System.out.println("\n\n\n\n\n\n\n\n Entrei no HomeActivity \n\n\n\n\n\n\n\n\n\n");
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_home);
         setupWindowInsets();

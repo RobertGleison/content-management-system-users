@@ -18,6 +18,10 @@ public class MediaResponseDTO implements Serializable {
     private Integer duration;
     private Map<String, String> bucketPaths;
     private LocalDateTime uploadTimestamp;
+    private String filePath = null;
+
+    public MediaResponseDTO() {
+    }
 
     public MediaResponseDTO(UUID id, String title, String description, String genre, Integer year, String publisher, Integer duration, Map<String, String> bucketPaths, LocalDateTime uploadTimestamp, byte[] thumbnail) {
         this.id = id;
@@ -80,7 +84,37 @@ public class MediaResponseDTO implements Serializable {
         return duration;
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setGenre(String genre) {
+        this.genre = genre;
+    }
+
+    public void setYear(Integer year) {
+        this.year = year;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    public void setPublisher(String publisher) {
+        this.publisher = publisher;
+    }
+
+    public void setDuration(Integer duration) {
+        this.duration = duration;
+    }
 }
 
 

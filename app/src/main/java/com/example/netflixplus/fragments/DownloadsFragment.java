@@ -1,14 +1,10 @@
 package com.example.netflixplus.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.PopupMenu;
-import android.widget.ProgressBar;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,8 +14,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.netflixplus.R;
+import com.example.netflixplus.activities.VideoPlayerActivity;
 import com.example.netflixplus.entities.MediaResponseDTO;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,9 +26,6 @@ public class DownloadsFragment extends Fragment {
     private RecyclerView downloadsRecyclerView;
     private View emptyStateContainer;
     private DownloadAdapter downloadAdapter;
-    private TextView storageInfoText;
-    private Switch smartDownloadsSwitch;
-    private Button findContentButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -43,41 +38,49 @@ public class DownloadsFragment extends Fragment {
     private void setupViews() {
         downloadsRecyclerView = rootView.findViewById(R.id.downloads_recycler_view);
         emptyStateContainer = rootView.findViewById(R.id.empty_state_container);
-        storageInfoText = rootView.findViewById(R.id.storage_info);
-        smartDownloadsSwitch = rootView.findViewById(R.id.smart_downloads_switch);
-        findContentButton = rootView.findViewById(R.id.find_content_button);
 
         // Setup RecyclerView
-        LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext());
-        downloadsRecyclerView.setLayoutManager(layoutManager);
-        downloadAdapter = new DownloadAdapter();
+        downloadsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        downloadAdapter = new DownloadAdapter(movie -> playMovie(movie));
         downloadsRecyclerView.setAdapter(downloadAdapter);
-
-        // Setup click listeners
-        findContentButton.setOnClickListener(v -> {
-            // Navigate to home or search fragment
-            Toast.makeText(requireContext(), "Navigate to content", Toast.LENGTH_SHORT).show();
-        });
-
-        smartDownloadsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            String status = isChecked ? "Smart Downloads enabled" : "Smart Downloads disabled";
-            Toast.makeText(requireContext(), status, Toast.LENGTH_SHORT).show();
-        });
-
-        rootView.findViewById(R.id.btn_settings).setOnClickListener(v -> {
-            Toast.makeText(requireContext(), "Open download settings", Toast.LENGTH_SHORT).show();
-        });
     }
 
     private void loadDownloads() {
-        // Simulate loading downloads - replace with actual local storage query
+        // Get downloaded movies from local storage
         List<MediaResponseDTO> downloads = getDownloadedMovies();
         updateUI(downloads);
     }
 
     private List<MediaResponseDTO> getDownloadedMovies() {
-        // TODO: Replace with actual local storage query
-        return new ArrayList<>(); // Return empty list for now
+        List<MediaResponseDTO> downloadedMovies = new ArrayList<>();
+
+        // Get the downloads directory
+        File downloadDir = new File(requireContext().getExternalFilesDir(null), "Downloads");
+
+        if (downloadDir.exists() && downloadDir.isDirectory()) {
+            // List all MP4 files
+            File[] files = downloadDir.listFiles((dir, name) -> name.toLowerCase().endsWith(".mp4"));
+
+            if (files != null) {
+                for (File file : files) {
+                    // Create a MediaResponseDTO for each file
+                    MediaResponseDTO media = new MediaResponseDTO();
+                    media.setTitle(getMovieNameFromFilename(file.getName()));
+                    media.setFilePath(file.getAbsolutePath());
+                    downloadedMovies.add(media);
+                }
+            }
+        }
+
+        return downloadedMovies;
+    }
+
+    private String getMovieNameFromFilename(String filename) {
+        // Remove the quality suffix and extension
+        // Example: "Movie_Name_HD.mp4" becomes "Movie Name"
+        String nameWithoutExtension = filename.substring(0, filename.lastIndexOf('.'));
+        String nameWithoutQuality = nameWithoutExtension.replaceAll("_(HD|SD)$", "");
+        return nameWithoutQuality.replace('_', ' ');
     }
 
     private void updateUI(List<MediaResponseDTO> downloads) {
@@ -99,21 +102,48 @@ public class DownloadsFragment extends Fragment {
         downloadAdapter.setDownloads(downloads);
     }
 
+    private void playMovie(MediaResponseDTO movie) {
+        File movieFile = new File(movie.getFilePath());
+        if (!movieFile.exists()) {
+            Toast.makeText(requireContext(), "Error: Movie file not found", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Intent intent = new Intent(requireContext(), VideoPlayerActivity.class);
+        intent.putExtra("videoPath", movie.getFilePath());
+        intent.putExtra("title", movie.getTitle());
+        startActivity(intent);
+    }
+
     private static class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.DownloadViewHolder> {
         private List<MediaResponseDTO> downloads = new ArrayList<>();
+        private final OnMovieClickListener listener;
+
+        interface OnMovieClickListener {
+            void onMovieClick(MediaResponseDTO movie);
+        }
+
+        DownloadAdapter(OnMovieClickListener listener) {
+            this.listener = listener;
+        }
 
         @NonNull
         @Override
         public DownloadViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_download, parent, false);
-            return new DownloadViewHolder(view);
+            // Using a simple TextView for the list item
+            TextView textView = new TextView(parent.getContext());
+            textView.setLayoutParams(new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT));
+            textView.setPadding(32, 24, 32, 24); // Add some padding
+            textView.setTextSize(16); // Set text size
+            return new DownloadViewHolder(textView);
         }
 
         @Override
         public void onBindViewHolder(@NonNull DownloadViewHolder holder, int position) {
             MediaResponseDTO media = downloads.get(position);
-            holder.bind(media);
+            holder.bind(media, listener);
         }
 
         @Override
@@ -127,51 +157,16 @@ public class DownloadsFragment extends Fragment {
         }
 
         static class DownloadViewHolder extends RecyclerView.ViewHolder {
-            private final ImageView thumbnail;
-            private final TextView title;
-            private final TextView info;
-            private final ImageView moreOptions;
-            private final ProgressBar downloadProgress;
+            private final TextView titleView;
 
             public DownloadViewHolder(@NonNull View itemView) {
                 super(itemView);
-                thumbnail = itemView.findViewById(R.id.movie_thumbnail);
-                title = itemView.findViewById(R.id.movie_title);
-                info = itemView.findViewById(R.id.movie_info);
-                moreOptions = itemView.findViewById(R.id.more_options);
-                downloadProgress = itemView.findViewById(R.id.download_progress);
+                titleView = (TextView) itemView;
             }
 
-            public void bind(MediaResponseDTO media) {
-                title.setText(media.getTitle());
-                info.setText(String.format("%s • %s", media.getGenre(), "1.2 GB"));
-
-//                Glide.with(itemView.getContext())
-//                        .load(media.getThumbnail())
-//                        .centerCrop()
-//                        .into(thumbnail);
-
-                moreOptions.setOnClickListener(v -> {
-                    // Show options popup (delete, share, etc.)
-                    showOptionsPopup(v, media);
-                });
-            }
-
-            private void showOptionsPopup(View anchor, MediaResponseDTO media) {
-                PopupMenu popup = new PopupMenu(anchor.getContext(), anchor);
-                popup.getMenuInflater().inflate(R.menu.download_options_menu, popup.getMenu());
-                popup.setOnMenuItemClickListener(item -> {
-                    int itemId = item.getItemId();
-                    if (itemId == R.id.action_delete) {
-                        // Handle delete
-                        return true;
-                    } else if (itemId == R.id.action_share) {
-                        // Handle share
-                        return true;
-                    }
-                    return false;
-                });
-                popup.show();
+            public void bind(MediaResponseDTO media, OnMovieClickListener listener) {
+                titleView.setText(media.getTitle());
+                titleView.setOnClickListener(v -> listener.onMovieClick(media));
             }
         }
     }

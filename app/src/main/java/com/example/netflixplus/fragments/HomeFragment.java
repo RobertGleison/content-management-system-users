@@ -26,7 +26,6 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
 public class HomeFragment extends Fragment implements MovieAdapter.OnMovieClickListener {
     private View rootView;
     private MovieAdapter trendingAdapter;
@@ -39,92 +38,78 @@ public class HomeFragment extends Fragment implements MovieAdapter.OnMovieClickL
     private MovieAdapter actionAdapter;
     private MovieAdapter fantasyAdapter;
 
+    private View trendingSection;
+    private View popularSection;
+    private View dramaSection;
+    private View animationSection;
+    private View fictionSection;
+    private View fantasySection;
+    private View horrorSection;
+    private View actionSection;
+    private View comedySection;
+
+    private RecyclerView trendingRecyclerView;
+    private RecyclerView popularRecyclerView;
+    private RecyclerView dramaRecyclerView;
+    private RecyclerView animationRecyclerView;
+    private RecyclerView fictionRecyclerView;
+    private RecyclerView fantasyRecyclerView;
+    private RecyclerView horrorRecyclerView;
+    private RecyclerView actionRecyclerView;
+    private RecyclerView comedyRecyclerView;
+
     private ImageView featuredMovieImage;
     private TextView featuredMovieTitle;
-
+    private MediaResponseDTO featuredMovie;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_home, container, false);
+        System.out.println("Estou no Home Fragment");
         setupViews();
+        System.out.println("Sai do setup views home fragment");
         loadMovies();
+        System.out.println("loadei os filmes");
         return rootView;
     }
-
 
     private void setupViews() {
         // Initialize featured movie views
         featuredMovieImage = rootView.findViewById(R.id.featured_movie_image);
         featuredMovieTitle = rootView.findViewById(R.id.featured_movie_title);
         rootView.findViewById(R.id.play_button).setOnClickListener(v -> {
-            Toast.makeText(requireContext(), "Play clicked", Toast.LENGTH_SHORT).show();
+            if (featuredMovie != null) {
+                onMovieClick(featuredMovie);
+            }
         });
 
-        // Initialize Trending RecyclerView
-        RecyclerView trendingRecyclerView = rootView.findViewById(R.id.trending_recycler_view);
-        LinearLayoutManager trendingLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
-        trendingRecyclerView.setLayoutManager(trendingLayoutManager);
-        trendingAdapter = new MovieAdapter(this);
-        trendingRecyclerView.setAdapter(trendingAdapter);
+        // Initialize sections
+        trendingSection = rootView.findViewById(R.id.trending_section);
+        popularSection = rootView.findViewById(R.id.popular_section);
+        dramaSection = rootView.findViewById(R.id.drama_section);
+        animationSection = rootView.findViewById(R.id.animation_section);
+        fictionSection = rootView.findViewById(R.id.fiction_section);
+        fantasySection = rootView.findViewById(R.id.fantasy_section);
+        horrorSection = rootView.findViewById(R.id.horror_section);
+        actionSection = rootView.findViewById(R.id.action_section);
+        comedySection = rootView.findViewById(R.id.comedy_section);
 
-        // Initialize Popular RecyclerView
-        RecyclerView popularRecyclerView = rootView.findViewById(R.id.popular_recycler_view);
-        LinearLayoutManager popularLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
-        popularRecyclerView.setLayoutManager(popularLayoutManager);
-        popularAdapter = new MovieAdapter(this);
-        popularRecyclerView.setAdapter(popularAdapter);
-
-        // Initialize Drama RecyclerView
-        RecyclerView dramaRecyclerView = rootView.findViewById(R.id.drama_recycler_view);
-        LinearLayoutManager dramaLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
-        dramaRecyclerView.setLayoutManager(dramaLayoutManager);
-        dramaAdapter = new MovieAdapter(this);
-        dramaRecyclerView.setAdapter(dramaAdapter);
-
-        // Initialize Animation RecyclerView
-        RecyclerView animationRecyclerView = rootView.findViewById(R.id.animation_recycler_view);
-        LinearLayoutManager animationLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
-        animationRecyclerView.setLayoutManager(animationLayoutManager);
-        animationAdapter = new MovieAdapter(this);
-        animationRecyclerView.setAdapter(animationAdapter);
-
-        // Initialize Fiction RecyclerView
-        RecyclerView fictionRecyclerView = rootView.findViewById(R.id.fiction_recycler_view);
-        LinearLayoutManager fictionLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
-        fictionRecyclerView.setLayoutManager(fictionLayoutManager);
-        fictionAdapter = new MovieAdapter(this);
-        fictionRecyclerView.setAdapter(fictionAdapter);
-
-        // Initialize Fantasy RecyclerView
-        RecyclerView fantasyRecyclerView = rootView.findViewById(R.id.fantasy_recycler_view);
-        LinearLayoutManager fantasyLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
-        fantasyRecyclerView.setLayoutManager(fantasyLayoutManager);
-        fantasyAdapter = new MovieAdapter(this);
-        fantasyRecyclerView.setAdapter(fantasyAdapter);
-
-        // Initialize Horror RecyclerView
-        RecyclerView horrorRecyclerView = rootView.findViewById(R.id.horror_recycler_view);
-        LinearLayoutManager horrorLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
-        horrorRecyclerView.setLayoutManager(horrorLayoutManager);
-        horrorAdapter = new MovieAdapter(this);
-        horrorRecyclerView.setAdapter(horrorAdapter);
-
-        // Initialize Action RecyclerView
-        RecyclerView actionRecyclerView = rootView.findViewById(R.id.action_recycler_view);
-        LinearLayoutManager actionLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
-        actionRecyclerView.setLayoutManager(actionLayoutManager);
-        actionAdapter = new MovieAdapter(this);
-        actionRecyclerView.setAdapter(actionAdapter);
-
-        // Initialize Comedy RecyclerView
-        RecyclerView comedyRecyclerView = rootView.findViewById(R.id.comedy_recycler_view);
-        LinearLayoutManager comedyLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
-        comedyRecyclerView.setLayoutManager(comedyLayoutManager);
-        comedyAdapter = new MovieAdapter(this);
-        comedyRecyclerView.setAdapter(comedyAdapter);
-
+        initializeRecyclerView(R.id.trending_recycler_view, trendingAdapter = new MovieAdapter(this));
+        initializeRecyclerView(R.id.popular_recycler_view, popularAdapter = new MovieAdapter(this));
+        initializeRecyclerView(R.id.drama_recycler_view, dramaAdapter = new MovieAdapter(this));
+        initializeRecyclerView(R.id.animation_recycler_view, animationAdapter = new MovieAdapter(this));
+        initializeRecyclerView(R.id.fiction_recycler_view, fictionAdapter = new MovieAdapter(this));
+        initializeRecyclerView(R.id.fantasy_recycler_view, fantasyAdapter = new MovieAdapter(this));
+        initializeRecyclerView(R.id.horror_recycler_view, horrorAdapter = new MovieAdapter(this));
+        initializeRecyclerView(R.id.action_recycler_view, actionAdapter = new MovieAdapter(this));
+        initializeRecyclerView(R.id.comedy_recycler_view, comedyAdapter = new MovieAdapter(this));
     }
 
+    private void initializeRecyclerView(int viewId, MovieAdapter adapter) {
+        RecyclerView recyclerView = rootView.findViewById(viewId);
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
+        recyclerView.setAdapter(adapter);
+    }
 
     private void loadMovies() {
         RetrofitClient.getInstance()
@@ -154,12 +139,11 @@ public class HomeFragment extends Fragment implements MovieAdapter.OnMovieClickL
                 });
     }
 
-
     private void updateUI(List<MediaResponseDTO> movies) {
         if (movies.isEmpty()) return;
 
         // Update featured movie
-        MediaResponseDTO featuredMovie = movies.get(0);
+        featuredMovie = movies.get(0);
         featuredMovieTitle.setText(featuredMovie.getTitle());
         ImageLoader.loadMovieThumbnail(requireContext(), featuredMovie.getBucketPaths().get("thumbnail"), featuredMovieImage);
 
@@ -177,20 +161,28 @@ public class HomeFragment extends Fragment implements MovieAdapter.OnMovieClickL
         for (MediaResponseDTO movie : movies) {
             String genre = movie.getGenre();
             if (genre != null) {
-                if (genre.equalsIgnoreCase("Drama")) {
-                    dramaMovies.add(movie);
-                } else if (genre.equalsIgnoreCase("Animation")) {
-                    animationMovies.add(movie);
-                } else if (genre.equalsIgnoreCase("Fiction")) {
-                    fictionMovies.add(movie);
-                } else if (genre.equalsIgnoreCase("Action")) {
-                    actionMovies.add(movie);
-                } else if (genre.equalsIgnoreCase("Comedy")) {
-                    comedyMovies.add(movie);
-                } else if (genre.equalsIgnoreCase("Fantasy")) {
-                    fantasyMovies.add(movie);
-                } else if (genre.equalsIgnoreCase("Horror")) {
-                    horrorMovies.add(movie);
+                switch (genre.toLowerCase()) {
+                    case "drama":
+                        dramaMovies.add(movie);
+                        break;
+                    case "animation":
+                        animationMovies.add(movie);
+                        break;
+                    case "fiction":
+                        fictionMovies.add(movie);
+                        break;
+                    case "action":
+                        actionMovies.add(movie);
+                        break;
+                    case "comedy":
+                        comedyMovies.add(movie);
+                        break;
+                    case "fantasy":
+                        fantasyMovies.add(movie);
+                        break;
+                    case "horror":
+                        horrorMovies.add(movie);
+                        break;
                 }
             }
 
@@ -201,17 +193,38 @@ public class HomeFragment extends Fragment implements MovieAdapter.OnMovieClickL
             }
         }
 
+        // Update sections visibility and content
+        updateSection(dramaSection, dramaAdapter, dramaMovies);
+        updateSection(animationSection, animationAdapter, animationMovies);
+        updateSection(fictionSection, fictionAdapter, fictionMovies);
+        updateSection(actionSection, actionAdapter, actionMovies);
+        updateSection(comedySection, comedyAdapter, comedyMovies);
+        updateSection(fantasySection, fantasyAdapter, fantasyMovies);
+        updateSection(horrorSection, horrorAdapter, horrorMovies);
+        updateSection(trendingSection, trendingAdapter, trendingMovies);
+        updateSection(popularSection, popularAdapter, popularMovies);
+    }
 
-        // Update all adapters
-        if (!dramaMovies.isEmpty()) dramaAdapter.setMovies(dramaMovies);
-        if (!animationMovies.isEmpty()) animationAdapter.setMovies(animationMovies);
-        if (!fictionMovies.isEmpty()) fictionAdapter.setMovies(fictionMovies);
-        if (!actionMovies.isEmpty()) actionAdapter.setMovies(actionMovies);
-        if (!comedyMovies.isEmpty()) comedyAdapter.setMovies(comedyMovies);
-        if (!fantasyMovies.isEmpty()) fantasyAdapter.setMovies(fantasyMovies);
-        if (!horrorMovies.isEmpty()) horrorAdapter.setMovies(horrorMovies);
-        if (!trendingMovies.isEmpty()) trendingAdapter.setMovies(trendingMovies);
-        if (!popularMovies.isEmpty()) popularAdapter.setMovies(popularMovies);
+    private void updateSection(View sectionView, MovieAdapter adapter, List<MediaResponseDTO> movies) {
+        if (movies == null || movies.isEmpty()) {
+            if (sectionView != null) {
+                ViewGroup.LayoutParams params = sectionView.getLayoutParams();
+                params.height = 0;  // Set height to 0
+                sectionView.setLayoutParams(params);
+                sectionView.setVisibility(View.GONE);  // Also set visibility to GONE
+                sectionView.setPadding(0, 0, 0, 0);  // Remove any padding
+            }
+            adapter.setMovies(new ArrayList<>()); // Clear the adapter
+        } else {
+            if (sectionView != null) {
+                ViewGroup.LayoutParams params = sectionView.getLayoutParams();
+                params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                sectionView.setLayoutParams(params);
+                sectionView.setVisibility(View.VISIBLE);
+                sectionView.setPadding(16, 16, 16, 16);  // Direct padding values in dp
+                adapter.setMovies(movies);
+            }
+        }
     }
 
 
@@ -232,6 +245,17 @@ public class HomeFragment extends Fragment implements MovieAdapter.OnMovieClickL
         intent.putExtra("publisher", media.getPublisher());
         intent.putExtra("duration", media.getDuration());
         intent.putExtra("mediaUrls", new HashMap<>(media.getBucketPaths()));
+        System.out.println("TESTE1: " + media.getBucketPaths().get("thumbnail"));
+        System.out.println("TESTE2: " + media.getBucketPaths().get("HD_HLS"));
+        System.out.println("TESTE3: " + media.getBucketPaths().get("LD_HLS"));
+        System.out.println("TESTE4: " + media.getBucketPaths().get("HD_default"));
+        System.out.println("TESTE5: " + media.getBucketPaths().get("HD_default"));
+        System.out.println("description: " + media.getDescription());
+        System.out.println("genre: " + media.getGenre());
+        System.out.println("title: " + media.getTitle());
+        System.out.println("year: " + media.getYear());
+        System.out.println("publisher: " + media.getPublisher());
+        System.out.println("duration: " + media.getDuration());
         startActivity(intent);
     }
 }

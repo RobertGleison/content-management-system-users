@@ -76,7 +76,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_weight="1"
-                android:text="Smart Downloads ON"
+                android:text="Bit Torrent ON"
                 android:textColor="@color/white"
                 android:textSize="14sp" />
 

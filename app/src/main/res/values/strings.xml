@@ -37,4 +37,11 @@
     <string name="title_activity_splash">SplashActivity</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+        <string name="download_starting">Starting download...</string>
+        <string name="download_progress">Downloading: %d%%</string>
+        <string name="download_complete">Download completed: %s</string>
+        <string name="download_failed">Download failed: %s</string>
+        <string name="hd_quality_selected">HD Quality Selected</string>
+        <string name="sd_quality_selected">SD Quality Selected</string>
+        <string name="duration_format">%d min</string>
 </resources>

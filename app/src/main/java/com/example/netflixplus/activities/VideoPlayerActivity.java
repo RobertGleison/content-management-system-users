@@ -45,7 +45,6 @@ public class VideoPlayerActivity extends AppCompatActivity {
         String selectedUrl = isHighQuality ? mediaUrls.get("HD_HLS") : mediaUrls.get("LD_HLS");
 
         player.setMediaItem(MediaItem.fromUri("selectedUrl"));
-//        player.setMediaItem(MediaItem.fromUri("http://34.141.197.84/live/output.m3u8"));
 
         player.prepare();
         player.seekTo(startPosition);  // Seek to saved position
