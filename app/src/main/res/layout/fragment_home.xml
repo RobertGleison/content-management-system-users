@@ -53,60 +53,6 @@
                 </LinearLayout>
             </FrameLayout>
 
-            <!-- Trending Now Section -->
-            <LinearLayout
-                android:id="@+id/trending_section"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="16dp"
-                    android:text="Trending Now"
-                    android:textColor="@color/white"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/trending_recycler_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:clipToPadding="false"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp" />
-            </LinearLayout>
-
-            <!-- Popular Section -->
-            <LinearLayout
-                android:id="@+id/popular_section"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="16dp"
-                    android:text="Popular"
-                    android:textColor="@color/white"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/popular_recycler_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:clipToPadding="false"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp" />
-            </LinearLayout>
-
             <!-- Drama Section -->
             <LinearLayout
                 android:id="@+id/drama_section"

@@ -14,7 +14,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.netflixplus.R;
-import com.example.netflixplus.utils.ImageLoader;
+import com.example.netflixplus.utils.ThumbnailLoader;
 import com.example.netflixplus.utils.VideoDownloader;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 
@@ -227,7 +227,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         durationView.setText(getString(R.string.duration_format, duration));
 
         if (thumbnailUrl != null) {
-            ImageLoader.loadMovieThumbnail(thumbnailUrl, thumbnailView);
+            ThumbnailLoader.loadThumbnailWithGCS(thumbnailUrl, thumbnailView);
         }
     }
 }

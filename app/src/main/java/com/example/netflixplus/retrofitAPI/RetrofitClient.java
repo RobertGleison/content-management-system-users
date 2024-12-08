@@ -1,29 +1,34 @@
 package com.example.netflixplus.retrofitAPI;
 
+import android.util.Log;
+
 import com.example.netflixplus.retrofitAPI.RetrofitInterface;
-import com.example.netflixplus.retrofitAPI.RetrofitNetworkConfig;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
 
-
 /**
- * Singleton class that manages the Retrofit instance for making API calls.
- * Configures and provides access to a Retrofit client with custom settings for:
- * - LocalDateTime serialization/deserialization
- * - Network timeouts
- * - Base URL configuration
- * - JSON conversion
+ * Singleton class managing Retrofit instance for API communication.
+ * Handles:
+ * - API client configuration
+ * - Authentication token management
+ * - JSON serialization/deserialization
+ * - Network timeouts and interceptors
+ * - Connection lifecycle
+ *
+ * This client uses OkHttp for HTTP operations and Gson for JSON processing.
+ * All network operations are configured according to RetrofitNetworkConfig settings.
  */
 public class RetrofitClient {
     private static RetrofitClient instance = null;
@@ -31,24 +36,32 @@ public class RetrofitClient {
     private static Gson gson;
     private static Retrofit retrofit;
     private static RetrofitInterface api;
+    private static String idToken; // Firebase ID token for authentication
+
 
     /**
-     * Private constructor that initializes the Retrofit instance with custom configurations.
-     * Sets up:
-     * - Custom TypeAdapter for LocalDateTime handling
-     * - OkHttpClient with timeout configurations
+     * Updates the authentication token used for API requests.
+     * This token is included in the Authorization header of all subsequent requests.
+     *
+     * @param token The Firebase ID token to use for authentication
+     */
+    public static void setIdToken(String token) {
+        idToken = token;
+    }
+
+
+    /**
+     * Private constructor to enforce singleton pattern.
+     * Initializes:
+     * - LocalDateTime type adapter for JSON serialization
+     * - Authentication interceptor for token handling
+     * - OkHttpClient with timeouts and interceptors
      * - Gson converter with custom type adapters
-     * - Retrofit instance with base URL and configurations
+     * - Retrofit instance with base configuration
      */
     private RetrofitClient() {
-        // Create custom TypeAdapter for LocalDateTime
+        // LocalDateTime adapter for JSON serialization
         TypeAdapter<LocalDateTime> localDateTimeAdapter = new TypeAdapter<LocalDateTime>() {
-            /**
-             * Writes LocalDateTime to JSON format.
-             * @param out JSON writer
-             * @param value LocalDateTime value to write
-             * @throws IOException if writing fails
-             */
             @Override
             public void write(JsonWriter out, LocalDateTime value) throws IOException {
                 if (value == null) {
@@ -58,13 +71,6 @@ public class RetrofitClient {
                 }
             }
 
-
-            /**
-             * Reads LocalDateTime from JSON format.
-             * @param in JSON reader
-             * @return parsed LocalDateTime or null if parsing fails
-             * @throws IOException if reading fails
-             */
             @Override
             public LocalDateTime read(JsonReader in) throws IOException {
                 if (in.peek() == com.google.gson.stream.JsonToken.NULL) {
@@ -81,19 +87,37 @@ public class RetrofitClient {
             }
         };
 
-        // Create OkHttpClient with timeout configurations
+        // Authentication interceptor for adding token to requests
+        Interceptor authInterceptor = chain -> {
+            Request originalRequest = chain.request();
+
+            if (idToken != null && !idToken.isEmpty()) {
+                Request newRequest = originalRequest.newBuilder()
+                        .header("Authorization", "Bearer " + idToken)
+                        .build();
+                Log.d("MovieDebug", "Sending request with token: " + idToken.substring(0, 10) + "..."); // Only log first 10 chars for security
+                return chain.proceed(newRequest);
+            } else {
+                Log.d("MovieDebug", "No token available for request!");
+            }
+
+            return chain.proceed(originalRequest);
+        };
+
+        // Configure OkHttpClient with timeouts and interceptor
         client = new OkHttpClient.Builder()
+                .addInterceptor(authInterceptor)
                 .connectTimeout(RetrofitNetworkConfig.CONNECT_TIMEOUT, TimeUnit.SECONDS)
                 .writeTimeout(RetrofitNetworkConfig.WRITE_TIMEOUT, TimeUnit.SECONDS)
                 .readTimeout(RetrofitNetworkConfig.READ_TIMEOUT, TimeUnit.SECONDS)
                 .build();
 
-        // Create Gson with custom TypeAdapter for LocalDateTime
+        // Configure Gson with custom type adapters
         gson = new GsonBuilder()
                 .registerTypeAdapter(LocalDateTime.class, localDateTimeAdapter)
                 .create();
 
-        // Create and configure Retrofit instance
+        // Build Retrofit instance
         retrofit = new Retrofit.Builder()
                 .baseUrl(RetrofitNetworkConfig.BASE_URL)
                 .client(client)
@@ -105,9 +129,10 @@ public class RetrofitClient {
 
 
     /**
-     * Gets the singleton instance of RetrofitClient.
+     * Returns the singleton instance of RetrofitClient.
      * Creates a new instance if one doesn't exist.
-     * @return The singleton instance of RetrofitClient
+     *
+     * @return The singleton RetrofitClient instance
      */
     public static synchronized RetrofitClient getInstance() {
         if (instance == null) instance = new RetrofitClient();
@@ -116,17 +141,26 @@ public class RetrofitClient {
 
 
     /**
-     * Gets the configured Retrofit interface for making API calls.
-     * @return The RetrofitInterface instance containing API endpoint definitions
+     * Provides access to the configured API interface.
+     *
+     * @return RetrofitInterface instance for making API calls
      */
     public RetrofitInterface getApi() {
         return api;
     }
 
+
     /**
      * Closes all active connections and cleans up resources.
-     * This method should be called when the application is being shut down
-     * or when you want to force close all network connections.
+     * This method:
+     * - Cancels all pending requests
+     * - Shuts down the executor service
+     * - Evicts all connections from the pool
+     * - Closes the cache
+     * - Clears all static references
+     *
+     * Call this method when cleaning up or when you need to reset
+     * the client's state completely.
      */
     public void closeConnection() {
         if (client != null) {
@@ -149,5 +183,6 @@ public class RetrofitClient {
         client = null;
         gson = null;
         retrofit = null;
+        idToken = null;
     }
 }

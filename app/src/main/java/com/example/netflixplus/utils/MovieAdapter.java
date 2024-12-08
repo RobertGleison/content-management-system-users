@@ -79,7 +79,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
      */
     private void loadMovieThumbnail(@NonNull MovieViewHolder holder, @NonNull MediaResponseDTO movie) {
         // Use the ImageLoader utility with the ImageView from the ViewHolder
-        ImageLoader.loadMovieThumbnail(movie.getBucketPaths().get("thumbnail"), holder.posterImage);
+        ThumbnailLoader.loadThumbnailWithGCS(movie.getBucketPaths().get("thumbnail"), holder.posterImage);
     }
 
 

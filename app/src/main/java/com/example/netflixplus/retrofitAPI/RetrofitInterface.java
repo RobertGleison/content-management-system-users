@@ -36,6 +36,9 @@ public interface RetrofitInterface {
     );
 
 
+    @POST("/authenticate")
+    Call<Void> authenticate();
+
 
     @GET("media")
     @Headers({"Accept: application/json", "Content-Type: application/json"})

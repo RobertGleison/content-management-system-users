@@ -1,7 +1,9 @@
 package com.example.netflixplus.activities;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.WindowManager;
 import android.widget.TextView;
 import androidx.activity.EdgeToEdge;
@@ -18,6 +20,8 @@ import com.example.netflixplus.fragments.HomeFragment;
 import com.example.netflixplus.fragments.SearchFragment;
 import com.example.netflixplus.fragments.DownloadsFragment;
 import com.example.netflixplus.fragments.ProfileFragment;
+import com.example.netflixplus.retrofitAPI.RetrofitClient;
+import com.example.netflixplus.utils.TokenRefreshHandler;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -27,8 +31,10 @@ import com.google.firebase.auth.FirebaseUser;
  * It manages multiple fragments through a bottom navigation bar.
  */
 public class HomeActivity extends AppCompatActivity {
-
+    private static final int PERMISSION_REQUEST_CODE = 123;
     private FirebaseAuth auth;
+    private FirebaseUser user;
+    private TokenRefreshHandler tokenRefreshHandler;
     private BottomNavigationView bottomNavigationView;
 
     @Override
@@ -38,13 +44,123 @@ public class HomeActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
         );
+
+        // Setup token refresh
+        tokenRefreshHandler = new TokenRefreshHandler(this);
+        tokenRefreshHandler.startTokenRefresh();
+
         initializeUI();
         checkAuthenticationState();
-        if (savedInstanceState == null) {
-            loadFragment(new HomeFragment()); // Load default fragment
+
+        // Add this line to set up the token before loading the fragment
+        setupAuthToken(() -> {
+            if (savedInstanceState == null) {
+                loadFragment(new HomeFragment()); // Load default fragment
+            }
+        });
+
+        checkAndRequestPermissions();
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkTokenExpiration();
+    }
+
+
+    public void setupAuthToken(Runnable onComplete) {
+        if (user == null) {
+            user = FirebaseAuth.getInstance().getCurrentUser();
+        }
+
+        if (user != null) {
+            user.getIdToken(true)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            String token = task.getResult().getToken();
+                            Log.d("MovieDebug", "Got new token from Firebase");
+                            RetrofitClient.setIdToken(token);
+                            onComplete.run(); // Run the callback after token is set
+                        } else {
+                            Log.e("MovieDebug", "Failed to get token", task.getException());
+                            handleInvalidToken();
+                        }
+                    });
+        } else {
+            Log.e("MovieDebug", "No current user found");
+            navigateToLogin();
         }
     }
 
+
+    private void checkTokenExpiration() {
+        if (user == null) return;
+
+        user.getIdToken(false)
+                .addOnSuccessListener(result -> {
+                    if (result == null || result.getToken() == null) {
+                        handleInvalidToken();
+                        return;
+                    }
+
+                    long expirationTime = result.getExpirationTimestamp() * 1000;
+                    if (System.currentTimeMillis() >= expirationTime) {
+                        handleInvalidToken();
+                    }
+                })
+                .addOnFailureListener(e -> handleInvalidToken());
+    }
+
+    private void handleInvalidToken() {
+        auth.signOut();
+        navigateToLogin();
+    }
+
+
+    /**
+     * Handles media permissions based on Android version.
+     * Requests appropriate permissions for accessing media files.
+     */
+    private void checkAndRequestPermissions() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            handleAndroid13Permissions();
+        } else {
+            handleLegacyPermissions();
+        }
+    }
+
+
+    /**
+     * Handles permissions for Android 13 (API 33) and above.
+     */
+    private void handleAndroid13Permissions() {
+        if (checkSelfPermission(android.Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED ||
+                checkSelfPermission(android.Manifest.permission.READ_MEDIA_VIDEO) != PackageManager.PERMISSION_GRANTED) {
+
+            requestPermissions(
+                    new String[]{
+                            android.Manifest.permission.READ_MEDIA_IMAGES,
+                            android.Manifest.permission.READ_MEDIA_VIDEO
+                    },
+                    PERMISSION_REQUEST_CODE
+            );
+        }
+    }
+
+
+    /**
+     * Handles permissions for Android versions below 13.
+     */
+    private void handleLegacyPermissions() {
+        if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(
+                    new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE},
+                    PERMISSION_REQUEST_CODE
+            );
+        }
+    }
 
     /**
      * Initializes the UI components and sets up navigation.
@@ -56,6 +172,7 @@ public class HomeActivity extends AppCompatActivity {
         setupWindowInsets();
 
         auth = FirebaseAuth.getInstance();
+        user = auth.getCurrentUser();
         setupBottomNavigation();
     }
 
