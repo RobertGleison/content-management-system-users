@@ -35,6 +35,7 @@ public class DownloadsFragment extends Fragment {
         return rootView;
     }
 
+
     private void setupViews() {
         downloadsRecyclerView = rootView.findViewById(R.id.downloads_recycler_view);
         emptyStateContainer = rootView.findViewById(R.id.empty_state_container);
@@ -45,11 +46,16 @@ public class DownloadsFragment extends Fragment {
         downloadsRecyclerView.setAdapter(downloadAdapter);
     }
 
+
+    /**
+     * Load all downloaded moview
+     */
     private void loadDownloads() {
         // Get downloaded movies from local storage
         List<MediaResponseDTO> downloads = getDownloadedMovies();
         updateUI(downloads);
     }
+
 
     private List<MediaResponseDTO> getDownloadedMovies() {
         List<MediaResponseDTO> downloadedMovies = new ArrayList<>();
@@ -75,6 +81,7 @@ public class DownloadsFragment extends Fragment {
         return downloadedMovies;
     }
 
+
     private String getMovieNameFromFilename(String filename) {
         // Remove the quality suffix and extension
         // Example: "Movie_Name_HD.mp4" becomes "Movie Name"
@@ -82,6 +89,7 @@ public class DownloadsFragment extends Fragment {
         String nameWithoutQuality = nameWithoutExtension.replaceAll("_(HD|SD)$", "");
         return nameWithoutQuality.replace('_', ' ');
     }
+
 
     private void updateUI(List<MediaResponseDTO> downloads) {
         if (downloads.isEmpty()) {
@@ -91,16 +99,19 @@ public class DownloadsFragment extends Fragment {
         }
     }
 
+
     private void showEmptyState() {
         downloadsRecyclerView.setVisibility(View.GONE);
         emptyStateContainer.setVisibility(View.VISIBLE);
     }
+
 
     private void showDownloads(List<MediaResponseDTO> downloads) {
         emptyStateContainer.setVisibility(View.GONE);
         downloadsRecyclerView.setVisibility(View.VISIBLE);
         downloadAdapter.setDownloads(downloads);
     }
+
 
     private void playMovie(MediaResponseDTO movie) {
         File movieFile = new File(movie.getFilePath());
@@ -114,6 +125,7 @@ public class DownloadsFragment extends Fragment {
         intent.putExtra("title", movie.getTitle());
         startActivity(intent);
     }
+
 
     private static class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.DownloadViewHolder> {
         private List<MediaResponseDTO> downloads = new ArrayList<>();
@@ -140,21 +152,25 @@ public class DownloadsFragment extends Fragment {
             return new DownloadViewHolder(textView);
         }
 
+
         @Override
         public void onBindViewHolder(@NonNull DownloadViewHolder holder, int position) {
             MediaResponseDTO media = downloads.get(position);
             holder.bind(media, listener);
         }
 
+
         @Override
         public int getItemCount() {
             return downloads.size();
         }
 
+
         public void setDownloads(List<MediaResponseDTO> downloads) {
             this.downloads = downloads;
             notifyDataSetChanged();
         }
+
 
         static class DownloadViewHolder extends RecyclerView.ViewHolder {
             private final TextView titleView;

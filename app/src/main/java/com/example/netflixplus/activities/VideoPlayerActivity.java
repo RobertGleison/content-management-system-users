@@ -17,6 +17,11 @@ import com.example.netflixplus.R;
 
 import java.util.Map;
 
+
+/**
+ * Activity for playing video content with position tracking and quality selection.
+ * Handles video playback using ExoPlayer and maintains playback position persistence.
+ */
 public class VideoPlayerActivity extends AppCompatActivity {
     private ExoPlayer player;
     private static final String POSITION_PREFERENCE = "video_position";
@@ -40,6 +45,10 @@ public class VideoPlayerActivity extends AppCompatActivity {
         playerView.setPlayer(player);
     }
 
+
+    /**
+     * Constructs and configures an ExoPlayer instance for video playback.
+     */
     protected ExoPlayer buildMoviePlayer(Map<String, String> mediaUrls, boolean isHighQuality, long startPosition) {
         player = new ExoPlayer.Builder(getApplicationContext()).build();
         String selectedUrl = isHighQuality ? mediaUrls.get("HD_HLS") : mediaUrls.get("LD_HLS");
@@ -52,11 +61,19 @@ public class VideoPlayerActivity extends AppCompatActivity {
         return player;
     }
 
+
+    /**
+     * Retrieves the saved playback position for a specific video.
+     */
     private long getSavedPosition(String videoId) {
         return getSharedPreferences(POSITION_PREFERENCE, MODE_PRIVATE)
                 .getLong(videoId, 0);
     }
 
+
+    /**
+     * Saves the current playback position for a specific video.
+     */
     private void savePosition(String videoId, long position) {
         getSharedPreferences(POSITION_PREFERENCE, MODE_PRIVATE)
                 .edit()
@@ -64,6 +81,10 @@ public class VideoPlayerActivity extends AppCompatActivity {
                 .apply();
     }
 
+
+    /**
+     * Handles activity pause by saving current playback position.
+     */
     @Override
     protected void onPause() {
         super.onPause();
@@ -72,6 +93,10 @@ public class VideoPlayerActivity extends AppCompatActivity {
         }
     }
 
+
+    /**
+     * Handles activity destruction by saving position and releasing player resources.
+     */
     @Override
     protected void onDestroy() {
         super.onDestroy();

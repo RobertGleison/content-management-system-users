@@ -27,7 +27,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
     /**
      * Constructs a new MovieAdapter with a click listener.
-     * @param listener The callback interface for handling movie click events
      */
     public MovieAdapter(OnMovieClickListener listener) {
         this.listener = listener;
@@ -37,7 +36,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
     /**
      * Updates the adapter's movie list and refreshes the view.
-     * @param movies New list of movies to display
      */
     public void setMovies(@NonNull List<MediaResponseDTO> movies) {
         this.movies = new ArrayList<>(movies); // Create defensive copy
@@ -55,8 +53,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
     /**
      * Creates the movie card view by inflating the layout.
-     * @param parent The parent ViewGroup
-     * @return Inflated movie card view
      */
     private View createMovieCardView(@NonNull ViewGroup parent) {
         return LayoutInflater.from(parent.getContext())
@@ -74,8 +70,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
     /**
      * Loads the movie thumbnail using Glide library.
-     * @param holder The ViewHolder to load the image into
-     * @param movie The movie containing the thumbnail URL
      */
     private void loadMovieThumbnail(@NonNull MovieViewHolder holder, @NonNull MediaResponseDTO movie) {
         // Use the ImageLoader utility with the ImageView from the ViewHolder
@@ -85,8 +79,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
     /**
      * Sets up the click listener for the movie item.
-     * @param holder The ViewHolder to attach the listener to
-     * @param movie The movie to pass to the click listener
      */
     private void setupClickListener(@NonNull MovieViewHolder holder, @NonNull MediaResponseDTO movie) {
         holder.itemView.setOnClickListener(v -> {

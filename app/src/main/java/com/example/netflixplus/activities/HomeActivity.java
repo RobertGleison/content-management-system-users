@@ -70,6 +70,9 @@ public class HomeActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Create an authentication token
+     */
     public void setupAuthToken(Runnable onComplete) {
         if (user == null) {
             user = FirebaseAuth.getInstance().getCurrentUser();
@@ -95,6 +98,9 @@ public class HomeActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Check if the token expired
+     */
     private void checkTokenExpiration() {
         if (user == null) return;
 
@@ -113,6 +119,10 @@ public class HomeActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> handleInvalidToken());
     }
 
+
+    /**
+     * Handle invalid tokens. If the tokens is invalid, go to Login Page.
+     */
     private void handleInvalidToken() {
         auth.signOut();
         navigateToLogin();

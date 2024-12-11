@@ -46,6 +46,7 @@ public class RegisterActivity extends AppCompatActivity {
         checkCurrentUser();
     }
 
+
     /**
      * Checks if a user is currently signed in and redirects to HomeActivity if true.
      */
@@ -56,6 +57,7 @@ public class RegisterActivity extends AppCompatActivity {
         }
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,6 +67,7 @@ public class RegisterActivity extends AppCompatActivity {
         setupClickListeners();
     }
 
+
     /**
      * Sets up the initial UI configuration including EdgeToEdge support.
      */
@@ -73,6 +76,7 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
         setupWindowInsets();
     }
+
 
     /**
      * Configures window insets for proper UI layout.
@@ -85,12 +89,14 @@ public class RegisterActivity extends AppCompatActivity {
         });
     }
 
+
     /**
      * Initializes Firebase Authentication instance.
      */
     private void initializeFirebase() {
         firebaseAuth = FirebaseAuth.getInstance();
     }
+
 
     /**
      * Binds all view references from the layout.
@@ -107,6 +113,7 @@ public class RegisterActivity extends AppCompatActivity {
         textViewLogin = findViewById(R.id.loginNow);
     }
 
+
     /**
      * Sets up click listeners for interactive elements.
      */
@@ -114,6 +121,7 @@ public class RegisterActivity extends AppCompatActivity {
         textViewLogin.setOnClickListener(v -> navigateToLogin());
         buttonRegister.setOnClickListener(v -> handleRegistration());
     }
+
 
     /**
      * Handles the registration process including input validation and Firebase authentication.
@@ -134,12 +142,9 @@ public class RegisterActivity extends AppCompatActivity {
         createFirebaseUser(email, password);
     }
 
+
     /**
      * Validates all user inputs for registration.
-     * @param email User's email address
-     * @param password User's password
-     * @param repeatedPassword Confirmation password
-     * @return boolean indicating if all inputs are valid
      */
     private boolean validateInputs(String email, String password, String repeatedPassword) {
         if (TextUtils.isEmpty(email)) {
@@ -165,19 +170,18 @@ public class RegisterActivity extends AppCompatActivity {
         return true;
     }
 
+
     /**
      * Creates a new user account with Firebase Authentication.
-     * @param email User's email address
-     * @param password User's password
      */
     private void createFirebaseUser(String email, String password) {
         firebaseAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this::handleRegistrationResult);
     }
 
+
     /**
      * Handles the result of the Firebase user creation attempt.
-     * @param task Firebase authentication task
      */
     private void handleRegistrationResult(@NonNull Task<AuthResult> task) {
         toggleLoadingState(false);
@@ -191,9 +195,9 @@ public class RegisterActivity extends AppCompatActivity {
         handleRegistrationError(task.getException());
     }
 
+
     /**
      * Handles various types of registration errors.
-     * @param exception The exception thrown during registration
      */
     private void handleRegistrationError(Exception exception) {
         if (exception instanceof FirebaseAuthUserCollisionException) {
@@ -205,11 +209,9 @@ public class RegisterActivity extends AppCompatActivity {
         }
     }
 
+
     /**
      * Shows an error message in the specified layout and focuses the related view.
-     * @param layout The TextInputLayout to show the error in
-     * @param viewToFocus The view to focus (can be null)
-     * @param errorMessage The error message to display
      */
     private void showError(TextInputLayout layout, View viewToFocus, String errorMessage) {
         Toast.makeText(RegisterActivity.this, errorMessage, Toast.LENGTH_LONG).show();
@@ -220,14 +222,15 @@ public class RegisterActivity extends AppCompatActivity {
         layout.setError(errorMessage);
     }
 
+
     /**
      * Toggles the loading state of the UI.
-     * @param isLoading Whether the UI should show loading state
      */
     private void toggleLoadingState(boolean isLoading) {
         buttonRegister.setVisibility(isLoading ? View.GONE : View.VISIBLE);
         progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
     }
+
 
     /**
      * Clears all error states from input layouts.
@@ -238,6 +241,7 @@ public class RegisterActivity extends AppCompatActivity {
         repeatPasswordLayout.setErrorEnabled(false);
     }
 
+
     /**
      * Navigates to the login screen.
      */
@@ -246,6 +250,7 @@ public class RegisterActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
+
 
     /**
      * Navigates to the home screen.

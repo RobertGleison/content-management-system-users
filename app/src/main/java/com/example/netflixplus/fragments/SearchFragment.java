@@ -43,6 +43,7 @@ public class SearchFragment extends Fragment implements MovieAdapter.OnMovieClic
     private final CompositeDisposable disposables = new CompositeDisposable();
     private final PublishSubject<String> searchSubject = PublishSubject.create();
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_search, container, false);
@@ -51,6 +52,7 @@ public class SearchFragment extends Fragment implements MovieAdapter.OnMovieClic
         loadAllMovies();
         return rootView;
     }
+
 
     private void setupViews() {
         searchEditText = rootView.findViewById(R.id.search_edit_text);
@@ -64,6 +66,10 @@ public class SearchFragment extends Fragment implements MovieAdapter.OnMovieClic
         searchResultsRecyclerView.setAdapter(searchAdapter);
     }
 
+
+    /**
+     * Setuo search bar view
+     */
     private void setupSearch() {
         // Setup RxJava search with debounce
         disposables.add(searchSubject
@@ -89,6 +95,10 @@ public class SearchFragment extends Fragment implements MovieAdapter.OnMovieClic
         });
     }
 
+
+    /**
+     * Trigger get all movies HTTP request to load movies on searching
+     */
     private void loadAllMovies() {
         RetrofitClient.getInstance()
                 .getApi()
@@ -110,6 +120,10 @@ public class SearchFragment extends Fragment implements MovieAdapter.OnMovieClic
                 });
     }
 
+
+    /**
+     * Make search of movie that contains the query input in the title name.
+     */
     private void performSearch(String query) {
         if (query.isEmpty()) {
             showEmptyState();
@@ -130,6 +144,10 @@ public class SearchFragment extends Fragment implements MovieAdapter.OnMovieClic
         updateSearchResults(searchResults);
     }
 
+
+    /**
+     * Update search when the user is typing the query on search bar
+     */
     private void updateSearchResults(List<MediaResponseDTO> results) {
         if (results.isEmpty()) {
             showEmptyState();
@@ -139,22 +157,38 @@ public class SearchFragment extends Fragment implements MovieAdapter.OnMovieClic
         }
     }
 
+
+    /**
+     * Open movie details card on movie card click
+     */
     private void showResults() {
         searchResultsRecyclerView.setVisibility(View.VISIBLE);
         emptyStateContainer.setVisibility(View.GONE);
     }
 
+
+    /**
+     * Open movie details card on movie card click
+     */
     private void showEmptyState() {
         searchResultsRecyclerView.setVisibility(View.GONE);
         emptyStateContainer.setVisibility(View.VISIBLE);
     }
 
+
+    /**
+     * Open movie details card on movie card click
+     */
     private void showError(String message) {
         if (getContext() != null) {
             Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
         }
     }
 
+
+    /**
+     * Open movie details card on movie card click
+     */
     @Override
     public void onMovieClick(MediaResponseDTO media) {
         Intent intent = new Intent(requireContext(), MovieDetailsActivity.class);
@@ -167,6 +201,7 @@ public class SearchFragment extends Fragment implements MovieAdapter.OnMovieClic
         intent.putExtra("mediaUrls", new HashMap<>(media.getBucketPaths()));
         startActivity(intent);
     }
+
 
     @Override
     public void onDestroyView() {

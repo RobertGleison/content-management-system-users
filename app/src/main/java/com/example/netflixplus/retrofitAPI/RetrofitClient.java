@@ -87,6 +87,7 @@ public class RetrofitClient {
             }
         };
 
+
         // Authentication interceptor for adding token to requests
         Interceptor authInterceptor = chain -> {
             Request originalRequest = chain.request();

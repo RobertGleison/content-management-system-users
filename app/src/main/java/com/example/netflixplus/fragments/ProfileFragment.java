@@ -31,6 +31,7 @@ public class ProfileFragment extends Fragment {
         return rootView;
     }
 
+
     private void setupViews() {
         profileName = rootView.findViewById(R.id.profile_name);
         profileEmail = rootView.findViewById(R.id.profile_email);
@@ -53,6 +54,10 @@ public class ProfileFragment extends Fragment {
                 showFeatureNotAvailable("Help"));
     }
 
+
+    /**
+     *  Create mock user profile in profile page
+     * */
     private void loadUserProfile() {
         // TODO: Load actual user data from your auth system
         // For now, we'll use placeholder data
@@ -60,11 +65,19 @@ public class ProfileFragment extends Fragment {
         profileEmail.setText("john.doe@example.com");
     }
 
+
+    /**
+     * Go to login page after click on logout button
+     * */
     private void handleLogout() {
         FirebaseAuth.getInstance().signOut();
         navigateToLogin();
     }
 
+
+    /**
+     * Redirect to login Activity
+     */
     private void navigateToLogin() {
         Intent intent = new Intent(requireActivity(), LoginActivity.class);
         // Clear the back stack so user can't go back after logout
@@ -73,6 +86,10 @@ public class ProfileFragment extends Fragment {
         requireActivity().finish(); // Close the HomePageActivity
     }
 
+
+    /**
+     * Show message of feature coming soon after click on mock option buttons
+     * */
     private void showFeatureNotAvailable(String featureName) {
         Toast.makeText(requireContext(),
                 featureName + " feature coming soon",

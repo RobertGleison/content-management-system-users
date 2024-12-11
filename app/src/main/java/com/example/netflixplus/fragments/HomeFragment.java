@@ -50,6 +50,7 @@ public class HomeFragment extends Fragment implements MovieAdapter.OnMovieClickL
     private TextView featuredMovieTitle;
     private MediaResponseDTO featuredMovie;
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_home, container, false);
@@ -57,6 +58,7 @@ public class HomeFragment extends Fragment implements MovieAdapter.OnMovieClickL
         loadMovies();
         return rootView;
     }
+
 
     private void setupViews() {
         featuredMovieImage = rootView.findViewById(R.id.featured_movie_image);
@@ -94,12 +96,20 @@ public class HomeFragment extends Fragment implements MovieAdapter.OnMovieClickL
         initializeRecyclerView(R.id.comedy_recycler_view, comedyAdapter);
     }
 
+
+    /**
+     * Replicate the movie card layout to each item on get all movies response. Basically set the grid
+     */
     private void initializeRecyclerView(int viewId, MovieAdapter adapter) {
         RecyclerView recyclerView = rootView.findViewById(viewId);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
         recyclerView.setAdapter(adapter);
     }
 
+
+    /**
+     * Load all movies in the home page
+     */
     private void loadMovies() {
         RetrofitClient.getInstance()
                 .getApi()
@@ -121,6 +131,10 @@ public class HomeFragment extends Fragment implements MovieAdapter.OnMovieClickL
                 });
     }
 
+
+    /**
+     * Setup the UI design with thumbnails on each genre section
+     */
     private void updateUI(List<MediaResponseDTO> movies) {
         if (movies.isEmpty()) return;
 
@@ -149,6 +163,10 @@ public class HomeFragment extends Fragment implements MovieAdapter.OnMovieClickL
         updateSection(horrorSection, horrorAdapter, moviesByGenre.get("horror"));
     }
 
+
+    /**
+     * Setup the UI design with thumbnails that have the same genre
+     */
     private void updateSection(View sectionView, MovieAdapter adapter, List<MediaResponseDTO> movies) {
         if (movies == null || movies.isEmpty()) {
             sectionView.setVisibility(View.GONE);
@@ -159,12 +177,20 @@ public class HomeFragment extends Fragment implements MovieAdapter.OnMovieClickL
         }
     }
 
+
+    /**
+     * Shows error messages if present
+     */
     private void showError(String message) {
         if (getContext() != null) {
             Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
         }
     }
 
+
+    /**
+     * Handle movie click to access movie details card
+     */
     @Override
     public void onMovieClick(MediaResponseDTO media) {
         Intent intent = new Intent(requireContext(), MovieDetailsActivity.class);

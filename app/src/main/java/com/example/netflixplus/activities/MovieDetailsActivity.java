@@ -64,6 +64,10 @@ public class MovieDetailsActivity extends AppCompatActivity {
         populateUI();
     }
 
+
+    /**
+     * Get movies metadata passed as parameters
+     * */
     private void extractIntentData(Intent intent) {
         title = intent.getStringExtra("title");
         description = intent.getStringExtra("description");
@@ -79,6 +83,10 @@ public class MovieDetailsActivity extends AppCompatActivity {
         }
     }
 
+
+    /**
+     * Initialize views
+     * */
     private void initializeViews() {
         thumbnailView = findViewById(R.id.movie_thumbnail);
         titleView = findViewById(R.id.movie_title);
@@ -97,11 +105,16 @@ public class MovieDetailsActivity extends AppCompatActivity {
 //        downloadProgressText.setVisibility(View.GONE);
     }
 
+
     private void setupClickListeners() {
         findViewById(R.id.play_button).setOnClickListener(v -> startVideoPlayer());
         downloadButton.setOnClickListener(v -> startDownload());
     }
 
+
+    /**
+     * Open video Player activity
+     * */
     private void startVideoPlayer() {
         Intent intent = new Intent(MovieDetailsActivity.this, VideoPlayerActivity.class);
         intent.putExtra("isHighQuality", isHighQuality);
@@ -114,6 +127,9 @@ public class MovieDetailsActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+
+    /**
+     * Handle movies download*/
     private void startDownload() {
         if (mediaUrls == null) {
             Toast.makeText(this, "Error: No media URLs available", Toast.LENGTH_SHORT).show();
@@ -134,6 +150,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
         startVideoDownload(videoUrl, filename);
     }
 
+
+    // Handle downloading progress on movie details card
     private void showProgressIndicators() {
         downloadProgress.setVisibility(View.VISIBLE);
         downloadProgressText.setVisibility(View.VISIBLE);
@@ -141,12 +159,20 @@ public class MovieDetailsActivity extends AppCompatActivity {
         downloadProgressText.setText(R.string.download_starting);
     }
 
+
+    /**
+     * Create filename of downloaded file
+     * */
     private String createFilename() {
         String sanitizedTitle = title.replaceAll("[^a-zA-Z0-9]", "_");
         String quality = isHighQuality ? "HD" : "SD";
         return sanitizedTitle + "_" + quality + ".mp4";
     }
 
+
+    /**
+     * Start video download
+     * */
     private void startVideoDownload(String videoUrl, String filename) {
         VideoDownloader.downloadVideo(
                 this,
@@ -171,10 +197,12 @@ public class MovieDetailsActivity extends AppCompatActivity {
         );
     }
 
+
     private void updateDownloadProgress(int progress) {
         downloadProgress.setProgress(progress);
         downloadProgressText.setText(getString(R.string.download_progress, progress));
     }
+
 
     private void handleDownloadSuccess(File downloadedFile) {
         resetDownloadUI();
@@ -191,6 +219,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         );
     }
 
+
     private void handleDownloadError(String error) {
         resetDownloadUI();
         Toast.makeText(this,
@@ -198,12 +227,16 @@ public class MovieDetailsActivity extends AppCompatActivity {
                 Toast.LENGTH_LONG).show();
     }
 
+
     private void resetDownloadUI() {
         downloadButton.setEnabled(true);
         downloadProgress.setVisibility(View.GONE);
         downloadProgressText.setVisibility(View.GONE);
     }
 
+    /**
+     * Handle movie quality option. Low or HIgh
+     * */
     private void setupQualityToggle() {
         qualityToggleGroup.check(R.id.high_quality_button);
 
@@ -217,6 +250,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
             }
         });
     }
+
 
     private void populateUI() {
         titleView.setText(title);

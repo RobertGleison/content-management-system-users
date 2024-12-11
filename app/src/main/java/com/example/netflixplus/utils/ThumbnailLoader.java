@@ -52,6 +52,10 @@ public class ThumbnailLoader {
                 .into(thumbnail);
     }
 
+
+    /**
+     * Convert authenticated url to public url to access gcp bucket
+     * */
     private static String convertToPublicUrl(String authenticatedUrl) {
         try {
             // Parse the URL to extract bucket and object path
