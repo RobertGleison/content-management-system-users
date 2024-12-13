@@ -19,6 +19,10 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        ndk {
+            abiFilters.add("arm64-v8a")
+        }
     }
 
     buildTypes {
@@ -78,6 +82,8 @@ dependencies {
         exclude(group = "com.google.protobuf", module = "protobuf-java")
     }
 
+    implementation("org.libtorrent4j:libtorrent4j-android-x86_64:2.0.6-26")
+    implementation("org.libtorrent4j:libtorrent4j-android-arm64:2.0.6-26")
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.ui)
     implementation(libs.androidx.media3.exoplayer.hls)

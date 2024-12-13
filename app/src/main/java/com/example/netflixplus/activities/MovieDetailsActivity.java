@@ -118,7 +118,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
     private void startVideoPlayer() {
         Intent intent = new Intent(MovieDetailsActivity.this, VideoPlayerActivity.class);
         intent.putExtra("isHighQuality", isHighQuality);
-        intent.putExtra("mediaUrls", new HashMap<>(mediaUrls));
+        intent.putExtra("title", title);
         System.out.println("TESTE: " + mediaUrls.get("thumbnail"));
         System.out.println("TESTE: " + mediaUrls.get("HD_HLS"));
         System.out.println("TESTE: " + mediaUrls.get("LD_HLS"));

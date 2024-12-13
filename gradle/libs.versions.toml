@@ -1,5 +1,7 @@
 [versions]
 googleCloudStorage = "2.22.4"
+libtorrent4j = "2.0.7-16"
+libtorrent4jArm64 = "2.x.x"
 media3 = "1.1.1"
 agp = "8.5.0"
 activity = "1.9.3"
@@ -77,6 +79,8 @@ firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "fir
 
 # Network
 google-cloud-storage = { module = "com.google.cloud:google-cloud-storage", version.ref = "googleCloudStorage" }
+libtorrent4j = { module = "org.libtorrent4j:libtorrent4j", version.ref = "libtorrent4j" }
+libtorrent4j-arm64 = { module = "org.libtorrent4j:libtorrent4j-arm64", version.ref = "libtorrent4jArm64" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }

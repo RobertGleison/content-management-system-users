@@ -34,14 +34,13 @@ public class VideoPlayerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_video_player);
         boolean isHighQuality = getIntent().getBooleanExtra("isHighQuality", true); // true as default
         String id = getIntent().getStringExtra("id"); // true as default
-        Map<String,String> mediaUrls = (Map<String, String>) getIntent().getSerializableExtra("mediaUrls");
-
+        String title = getIntent().getStringExtra("title");
         PlayerView playerView = findViewById(R.id.videoPlayer);
 
         // Get saved position
         long savedPosition = getSavedPosition(id);
 
-        player = buildMoviePlayer(mediaUrls, isHighQuality, savedPosition);
+        player = buildMoviePlayer(title, isHighQuality, savedPosition);
         playerView.setPlayer(player);
     }
 
@@ -49,11 +48,17 @@ public class VideoPlayerActivity extends AppCompatActivity {
     /**
      * Constructs and configures an ExoPlayer instance for video playback.
      */
-    protected ExoPlayer buildMoviePlayer(Map<String, String> mediaUrls, boolean isHighQuality, long startPosition) {
+    protected ExoPlayer buildMoviePlayer(String title, boolean isHighQuality, long startPosition) {
+        String filename = title.replaceAll("[^a-zA-Z0-9]", "_").toLowerCase();
         player = new ExoPlayer.Builder(getApplicationContext()).build();
-        String selectedUrl = isHighQuality ? mediaUrls.get("HD_HLS") : mediaUrls.get("LD_HLS");
+        String quality = isHighQuality ? "HD_HLS" : "LD_HLS";
+        String selectedUrl = "http://netflixppup.duckdns.org/movies/" +
+                              filename +
+                              "/" +
+                              quality +
+                              "/output.m3u8";
 
-        player.setMediaItem(MediaItem.fromUri("selectedUrl"));
+        player.setMediaItem(MediaItem.fromUri(selectedUrl));
 
         player.prepare();
         player.seekTo(startPosition);  // Seek to saved position
