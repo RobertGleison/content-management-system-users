@@ -1,19 +1,27 @@
 
 package com.example.netflixplus.activities;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.media3.common.MediaItem;
+import androidx.media3.common.util.UnstableApi;
+import androidx.media3.datasource.DataSource;
+import androidx.media3.datasource.DefaultHttpDataSource;
+import androidx.media3.datasource.HttpDataSource;
 import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
 import androidx.media3.ui.PlayerView;
 
 import com.example.netflixplus.R;
+import com.example.netflixplus.retrofitAPI.RetrofitClient;
 
 import java.util.Map;
 
@@ -24,6 +32,7 @@ import java.util.Map;
  */
 public class VideoPlayerActivity extends AppCompatActivity {
     private ExoPlayer player;
+    private final String authToken = RetrofitClient.getIdToken();
     private static final String POSITION_PREFERENCE = "video_position";
     private static final String VIDEO_ID = "video_id";  // To identify different videos
 
@@ -48,9 +57,26 @@ public class VideoPlayerActivity extends AppCompatActivity {
     /**
      * Constructs and configures an ExoPlayer instance for video playback.
      */
+    @OptIn(markerClass = UnstableApi.class)
     protected ExoPlayer buildMoviePlayer(String title, boolean isHighQuality, long startPosition) {
         String filename = title.replaceAll("[^a-zA-Z0-9]", "_").toLowerCase();
-        player = new ExoPlayer.Builder(getApplicationContext()).build();
+
+        HttpDataSource.Factory httpDataSourceFactory = new DefaultHttpDataSource.Factory().setAllowCrossProtocolRedirects(true);
+        DataSource.Factory dataSourceFactory =
+                () -> {
+                    HttpDataSource dataSource = httpDataSourceFactory.createDataSource();
+                    // Set a custom authentication request header.
+                    dataSource.setRequestProperty("Authorization", "Bearer " + authToken);
+                    return dataSource;
+                };
+        Context context = getApplicationContext();
+        player = new ExoPlayer.Builder(context)
+                .setMediaSourceFactory(
+                        new DefaultMediaSourceFactory(context).setDataSourceFactory(dataSourceFactory))
+                .build();
+
+
+//        player = new ExoPlayer.Builder(getApplicationContext()).build();
         String quality = isHighQuality ? "HD_HLS" : "LD_HLS";
         String selectedUrl = "http://netflixppup.duckdns.org/movies/" +
                               filename +

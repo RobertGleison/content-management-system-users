@@ -45,8 +45,15 @@ public class RetrofitClient {
      *
      * @param token The Firebase ID token to use for authentication
      */
-    public static void setIdToken(String token) {
+    public static String setIdToken(String token) {
         idToken = token;
+        Log.d("TAG", "Token ="+token);    // Debug
+        Log.i("TAG", "Token ="+token);
+        return idToken;
+    }
+
+    public static String getIdToken() {
+        return idToken;
     }
 
 

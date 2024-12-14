@@ -84,7 +84,9 @@ public class HomeActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             String token = task.getResult().getToken();
                             Log.d("MovieDebug", "Got new token from Firebase");
-                            RetrofitClient.setIdToken(token);
+                            String settedtoken = RetrofitClient.setIdToken(token);
+                            Log.d("MovieDebug", "Token is:" + settedtoken);
+
                             onComplete.run(); // Run the callback after token is set
                         } else {
                             Log.e("MovieDebug", "Failed to get token", task.getException());
