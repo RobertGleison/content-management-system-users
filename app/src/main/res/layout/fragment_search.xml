@@ -24,19 +24,20 @@
                 android:orientation="horizontal"
                 android:padding="8dp">
 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                <Spinner
+                    android:id="@+id/movies_genre_list"
+                    android:layout_width="40dp"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginStart="8dp"
-                    android:src="@android:drawable/ic_menu_search"
-                    app:tint="@color/white" />
+                    android:background="@drawable/items_menu_icon"
+                    android:backgroundTint="@color/white"
+                    android:popupBackground="#333333" />
 
                 <EditText
                     android:id="@+id/search_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="5dp"
                     android:background="@null"
                     android:hint="Search for a show, movie, genre, etc."
                     android:textColor="@color/white"

@@ -7,7 +7,11 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
@@ -21,6 +25,7 @@ import com.example.netflixplus.retrofitAPI.RetrofitClient;
 import com.example.netflixplus.utils.MovieAdapter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -64,6 +69,9 @@ public class SearchFragment extends Fragment implements MovieAdapter.OnMovieClic
         searchResultsRecyclerView.setLayoutManager(gridLayoutManager);
         searchAdapter = new MovieAdapter(this);
         searchResultsRecyclerView.setAdapter(searchAdapter);
+
+        // Add this line to setup the spinner
+        setupGenreSpinner();
     }
 
 
@@ -93,6 +101,72 @@ public class SearchFragment extends Fragment implements MovieAdapter.OnMovieClic
             @Override
             public void afterTextChanged(Editable s) {}
         });
+    }
+
+    private void setupGenreSpinner() {
+        Spinner spinner = rootView.findViewById(R.id.movies_genre_list);
+
+        // Create list of genres
+        List<String> genres = Arrays.asList("All", "Drama", "Animation", "Fiction", "Action", "Comedy", "Fantasy", "Horror");
+
+        // Create and set the adapter
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(
+                requireContext(),
+                android.R.layout.simple_spinner_item,
+                genres) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View view = super.getView(position, convertView, parent);
+                // Make the selected item view empty/invisible
+                TextView textView = (TextView) view;
+                textView.setText("");
+                return view;
+            }
+        };
+
+        // Specify the layout to use when the list of choices appears
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // Set the adapter to the spinner
+        spinner.setAdapter(spinnerAdapter);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedGenre = parent.getItemAtPosition(position).toString();
+                if (!selectedGenre.equals("All")) {
+                    loadMoviesByGenre(selectedGenre);
+                } else {
+                    loadAllMovies();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                loadAllMovies();
+            }
+        });
+    }
+
+    private void loadMoviesByGenre(String genre) {
+        RetrofitClient.getInstance()
+                .getApi()
+                .getMediaByGenre(genre)
+                .enqueue(new Callback<List<MediaResponseDTO>>() {
+                    @Override
+                    public void onResponse(Call<List<MediaResponseDTO>> call, Response<List<MediaResponseDTO>> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            updateSearchResults(response.body());
+                        } else {
+                            showError("Failed to load movies for genre: " + genre);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<MediaResponseDTO>> call, Throwable t) {
+                        showError("Network Error: " + t.getMessage());
+                    }
+                });
     }
 
 
