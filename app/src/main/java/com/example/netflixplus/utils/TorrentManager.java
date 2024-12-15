@@ -15,6 +15,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class TorrentManager {
 
@@ -58,15 +59,28 @@ public class TorrentManager {
         });
         s.start();
     }
-    public void downloadTorrent(byte[] torrent, String movieName){
+    public File downloadTorrent(byte[] torrent, String movieName){
         TorrentInfo torrentInfo = new TorrentInfo(torrent);
         s.download(torrentInfo,outputDirectory);
+        System.out.println("Starting Download");
         TorrentHandle handle = s.find(torrentInfo.infoHash());
         new Torrent(movieName, handle, s);
+        for (int i = 0; i < 100; i++) {
+            try {
+                if (!(signal.await(30, TimeUnit.SECONDS))){
+                    break;
+                }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            handle.forceReannounce();
+        }
         try {
             signal.await();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+        String fileName = torrentInfo.files().fileName(0);
+        return new File(outputDirectory, fileName);
     }
 }
