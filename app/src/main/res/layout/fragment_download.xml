@@ -19,42 +19,11 @@
             app:title="Downloads"
             app:titleTextColor="@color/white">
 
-            <ImageView
-                android:id="@+id/btn_settings"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="end"
-                android:layout_marginEnd="16dp"
-                android:src="@android:drawable/ic_menu_manage"
-                app:tint="@color/white" />
+
 
         </androidx.appcompat.widget.Toolbar>
 
-        <!-- Storage Info -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
 
-            <TextView
-                android:id="@+id/storage_info"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="1.2 GB of 32.0 GB used"
-                android:textColor="#808080"
-                android:textSize="14sp" />
-
-            <ProgressBar
-                android:id="@+id/storage_progress"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="4dp"
-                android:layout_marginTop="8dp"
-                android:progress="25"
-                android:progressTint="@color/white"
-                android:progressBackgroundTint="#808080" />
-        </LinearLayout>
 
         <!-- Smart Downloads Info -->
         <LinearLayout

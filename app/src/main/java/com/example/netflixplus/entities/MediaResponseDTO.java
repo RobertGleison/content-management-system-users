@@ -47,8 +47,8 @@ public class MediaResponseDTO implements Serializable {
         this.uploadTimestamp = uploadTimestamp;
     }
 
-    public UUID getId() {
-        return id;
+    public String getId() {
+        return id.toString();
     }
 
     public void setId(UUID id) {

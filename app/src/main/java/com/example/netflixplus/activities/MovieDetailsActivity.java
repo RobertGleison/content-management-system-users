@@ -58,6 +58,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
             return;
         }
 
+
         initializeViews();
         setupClickListeners();
         setupQualityToggle();
@@ -69,6 +70,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
      * Get movies metadata passed as parameters
      * */
     private void extractIntentData(Intent intent) {
+        id = intent.getStringExtra("id");
         title = intent.getStringExtra("title");
         description = intent.getStringExtra("description");
         genre = intent.getStringExtra("genre");
@@ -119,6 +121,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         Intent intent = new Intent(MovieDetailsActivity.this, VideoPlayerActivity.class);
         intent.putExtra("isHighQuality", isHighQuality);
         intent.putExtra("title", title);
+        intent.putExtra("id", id);
         System.out.println("TESTE: " + mediaUrls.get("thumbnail"));
         System.out.println("TESTE: " + mediaUrls.get("HD_HLS"));
         System.out.println("TESTE: " + mediaUrls.get("LD_HLS"));
@@ -138,9 +141,9 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
         // Disable download button while downloading
         downloadButton.setEnabled(false);
-        showProgressIndicators();
+//        showProgressIndicators();
 
-        String videoUrl = isHighQuality ? mediaUrls.get("HD_default") : mediaUrls.get("SD_default");
+        String videoUrl = isHighQuality ? mediaUrls.get("HD_default") : mediaUrls.get("LD_default");
         if (videoUrl == null) {
             handleDownloadError("Invalid video URL");
             return;
@@ -166,7 +169,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
     private String createFilename() {
         String sanitizedTitle = title.replaceAll("[^a-zA-Z0-9]", "_");
         String quality = isHighQuality ? "HD" : "SD";
-        return sanitizedTitle + "_" + quality + ".mp4";
+        return sanitizedTitle + "_" + quality + ".x-msvideo";
     }
 
 
@@ -174,7 +177,9 @@ public class MovieDetailsActivity extends AppCompatActivity {
      * Start video download
      * */
     private void startVideoDownload(String videoUrl, String filename) {
+        String path = "/home/robert/Desktop/mobile/content-management-system-users/app/src/google-services.json";
         VideoDownloader.downloadVideo(
+                path,
                 this,
                 videoUrl,
                 filename,

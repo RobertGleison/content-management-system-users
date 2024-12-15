@@ -195,6 +195,7 @@ public class HomeFragment extends Fragment implements MovieAdapter.OnMovieClickL
     public void onMovieClick(MediaResponseDTO media) {
         Intent intent = new Intent(requireContext(), MovieDetailsActivity.class);
         intent.putExtra("title", media.getTitle());
+        intent.putExtra("id", media.getId());
         intent.putExtra("description", media.getDescription());
         intent.putExtra("genre", media.getGenre());
         intent.putExtra("year", media.getYear());
