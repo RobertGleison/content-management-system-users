@@ -20,7 +20,7 @@
         android:id="@+id/bottomNavigationView"
         app:itemIconSize="30dp"
         app:itemTextAppearanceActive="@style/BottomNavText"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?android:attr/windowBackground"
         app:layout_constraintBottom_toBottomOf="parent"
