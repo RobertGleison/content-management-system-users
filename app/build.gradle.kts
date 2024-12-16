@@ -56,6 +56,7 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
             excludes += "META-INF/INDEX.LIST"
+            excludes += "META-INF/DEPENDENCIES"
             excludes += "google/protobuf/type.proto"
             excludes += "google/protobuf/timestamp.proto"
             excludes += "google/protobuf/duration.proto"
@@ -82,6 +83,7 @@ dependencies {
         exclude(group = "com.google.protobuf", module = "protobuf-java")
     }
 
+    implementation("com.google.auth:google-auth-library-oauth2-http:1.19.0")
     implementation("org.libtorrent4j:libtorrent4j-android-x86_64:2.0.6-26")
     implementation("org.libtorrent4j:libtorrent4j-android-arm64:2.0.6-26")
     implementation(libs.androidx.media3.exoplayer)
