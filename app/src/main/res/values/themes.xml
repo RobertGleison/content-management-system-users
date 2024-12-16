@@ -35,5 +35,12 @@
         <item name="colorOnPrimary">@color/almost_white</item>
     </style>
 
+    <style name="Theme.NetflixRed" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorOnPrimary">@color/almost_white</item>
+        <item name="colorOnSecondary">#87F6101A</item>
+        <item name="colorAccent">#87F6101A</item>
+    </style>
+
 
 </resources>

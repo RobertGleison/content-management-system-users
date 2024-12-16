@@ -18,7 +18,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class SplashActivity extends AppCompatActivity {
 
-    private static final int SPLASH_TIME = 2500;
+    private static final int SPLASH_TIME = 3500;
     private FirebaseAuth mAuth;
 
     @Override
@@ -27,13 +27,6 @@ public class SplashActivity extends AppCompatActivity {
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
-
-        // Check for current user first
-        if (isUserLoggedIn()) {
-            // Skip splash and go directly to main screen
-            navigateToMainScreen();
-            return;
-        }
 
         // If no user logged in, proceed with normal splash screen
         EdgeToEdge.enable(this);
