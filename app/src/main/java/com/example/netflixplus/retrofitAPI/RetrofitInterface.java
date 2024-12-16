@@ -36,7 +36,7 @@ public interface RetrofitInterface {
     );
 
 
-    @POST("/authenticate")
+    @POST("media/authenticate")
     Call<Void> authenticate();
 
 

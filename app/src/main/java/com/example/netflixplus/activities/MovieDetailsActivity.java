@@ -1,8 +1,13 @@
 package com.example.netflixplus.activities;
 
 
+import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.MediaScannerConnection;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -11,15 +16,16 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.netflixplus.R;
+import com.example.netflixplus.retrofitAPI.RetrofitClient;
 import com.example.netflixplus.utils.ThumbnailLoader;
-import com.example.netflixplus.utils.VideoDownloader;
+import com.example.netflixplus.utils.TorrentDownloadService;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
 
 public class MovieDetailsActivity extends AppCompatActivity {
@@ -37,11 +43,14 @@ public class MovieDetailsActivity extends AppCompatActivity {
     private String id;
     private Map<String, String> mediaUrls;
 
+
+
+
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_details);
-
         // Get data from intent
         Intent intent = getIntent();
         if (intent == null) {
@@ -57,6 +66,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
             finish();
             return;
         }
+        IntentFilter filter = new IntentFilter("com.example.netflixplus.TORRENT_DOWNLOAD_COMPLETE");
+        registerReceiver(torrentReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
 
 
         initializeViews();
@@ -64,6 +75,12 @@ public class MovieDetailsActivity extends AppCompatActivity {
         setupQualityToggle();
         populateUI();
     }
+//    @Override
+//    protected void onDestroy() {
+//        super.onDestroy();
+//        // Unregister the receiver
+//        unregisterReceiver(torrentReceiver);
+//    }
 
 
     /**
@@ -133,6 +150,10 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
     /**
      * Handle movies download*/
+
+
+
+
     private void startDownload() {
         if (mediaUrls == null) {
             Toast.makeText(this, "Error: No media URLs available", Toast.LENGTH_SHORT).show();
@@ -142,71 +163,52 @@ public class MovieDetailsActivity extends AppCompatActivity {
         // Disable download button while downloading
         downloadButton.setEnabled(false);
 //        showProgressIndicators();
+        String convertedTitle = title.replaceAll("[^a-zA-Z0-9]", "_").toLowerCase();
+        String quality = isHighQuality ? "HD_video" : "LD_video";
+        System.out.println("title: " + convertedTitle);
+        Intent serviceIntent = new Intent(this, TorrentDownloadService.class);
+        serviceIntent.putExtra("title", convertedTitle);
+        serviceIntent.putExtra("quality", quality);
+        serviceIntent.putExtra("accessToken", RetrofitClient.getIdToken());
+        System.out.println("Gonna Start service" + serviceIntent);
+        this.startService(serviceIntent);
+    }
 
-        String videoUrl = isHighQuality ? mediaUrls.get("HD_default") : mediaUrls.get("LD_default");
-        if (videoUrl == null) {
-            handleDownloadError("Invalid video URL");
-            return;
+    private final BroadcastReceiver torrentReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            System.out.println("Received Broadcast");
+            String filePath = intent.getStringExtra("filePath");
+            if (filePath != null) {
+                File file = new File(filePath);
+                handleDownloadSuccess(file);
+                Toast.makeText(context, "Download complete: " + file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
+            } else {
+                String error = intent.getStringExtra("error");
+                Toast.makeText(context, "Error: " + error, Toast.LENGTH_SHORT).show();
+            }
         }
-
-        String filename = createFilename();
-        startVideoDownload(videoUrl, filename);
-    }
+    };
 
 
-    // Handle downloading progress on movie details card
-    private void showProgressIndicators() {
-        downloadProgress.setVisibility(View.VISIBLE);
-        downloadProgressText.setVisibility(View.VISIBLE);
-        downloadProgress.setProgress(0);
-        downloadProgressText.setText(R.string.download_starting);
-    }
+//    // Handle downloading progress on movie details card
+//    private void showProgressIndicators() {
+//        downloadProgress.setVisibility(View.VISIBLE);
+//        downloadProgressText.setVisibility(View.VISIBLE);
+//        downloadProgress.setProgress(0);
+//        downloadProgressText.setText(R.string.download_starting);
+//    }
+//
+//
+//    /**
+//     * Create filename of downloaded file
+//     * */
+//
+//
+//    /**
+//     * Start video download
+//     * */
 
-
-    /**
-     * Create filename of downloaded file
-     * */
-    private String createFilename() {
-        String sanitizedTitle = title.replaceAll("[^a-zA-Z0-9]", "_");
-        String quality = isHighQuality ? "HD" : "SD";
-        return sanitizedTitle + "_" + quality + ".x-msvideo";
-    }
-
-
-    /**
-     * Start video download
-     * */
-    private void startVideoDownload(String videoUrl, String filename) {
-        String path = "/home/robert/Desktop/mobile/content-management-system-users/app/src/google-services.json";
-        VideoDownloader.downloadVideo(
-                path,
-                this,
-                videoUrl,
-                filename,
-                new VideoDownloader.DownloadProgressListener() {
-                    @Override
-                    public void onProgressUpdate(int progress) {
-                        runOnUiThread(() -> updateDownloadProgress(progress));
-                    }
-
-                    @Override
-                    public void onDownloadComplete(File downloadedFile) {
-                        runOnUiThread(() -> handleDownloadSuccess(downloadedFile));
-                    }
-
-                    @Override
-                    public void onError(String error) {
-                        runOnUiThread(() -> handleDownloadError(error));
-                    }
-                }
-        );
-    }
-
-
-    private void updateDownloadProgress(int progress) {
-        downloadProgress.setProgress(progress);
-        downloadProgressText.setText(getString(R.string.download_progress, progress));
-    }
 
 
     private void handleDownloadSuccess(File downloadedFile) {
@@ -228,10 +230,10 @@ public class MovieDetailsActivity extends AppCompatActivity {
     private void handleDownloadError(String error) {
         resetDownloadUI();
         Toast.makeText(this,
-                getString(R.string.download_failed, error),
+
+             getString(R.string.download_failed, error),
                 Toast.LENGTH_LONG).show();
     }
-
 
     private void resetDownloadUI() {
         downloadButton.setEnabled(true);

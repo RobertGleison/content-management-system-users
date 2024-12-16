@@ -19,12 +19,20 @@ import java.util.concurrent.TimeUnit;
 
 public class TorrentManager {
 
+    private static TorrentManager instance;
     private final File outputDirectory;
     CountDownLatch signal;
     SessionManager s;
     List<Torrent> runningTorrents = new ArrayList<Torrent>() ;
 
-    TorrentManager(File outputDirectory){
+    public static TorrentManager getInstance(File outputDirectory) {
+        if (instance == null) {
+            System.out.println("Creating Torrent Instance with ouput Directory: " + outputDirectory);
+            instance = new TorrentManager(outputDirectory);
+        }
+        return instance;
+    }
+    private TorrentManager(File outputDirectory){
         this.outputDirectory = outputDirectory;
         s = new SessionManager();
         signal = new CountDownLatch(1);
@@ -61,10 +69,11 @@ public class TorrentManager {
     public File downloadTorrent(byte[] torrent, String movieName, String token){
         TorrentInfo torrentInfo = new TorrentInfo(torrent);
         String filename = torrentInfo.files().fileName(0);
-        String httpSeed = String.format("http://%s/%s/%s/%s", RetrofitNetworkConfig.BASE_URL, "movies", movieName, filename);
+        String httpSeed = String.format("%s/%s/%s/%s", RetrofitNetworkConfig.BASE_URL, "movies", movieName, filename);
         System.out.println("httpSeed = " + httpSeed);
         torrentInfo.addHttpSeed(httpSeed, "Bearer " + token);
-        s.download(torrentInfo,outputDirectory);
+        File movieDir = new File(outputDirectory, movieName);
+        s.download(torrentInfo,movieDir);
         System.out.println("Starting Download");
         TorrentHandle handle = s.find(torrentInfo.infoHash());
         new Torrent(movieName, handle, s);
@@ -83,7 +92,8 @@ public class TorrentManager {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        String outFile = filename + "_" + movieName + ".mp4";
-        return new File(outputDirectory, outFile);
+        File result = new File(movieDir, filename);
+        System.out.println("Finished downloading movie to: " + result.getAbsolutePath());
+        return result;
     }
 }

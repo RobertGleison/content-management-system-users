@@ -24,7 +24,8 @@
             android:exported="false" />
         <activity
             android:name=".activities.MovieDetailsActivity"
-            android:exported="false" /> <!-- Splash Activity as launcher -->
+            android:exported="false"
+                /> <!-- Splash Activity as launcher -->
         <activity
             android:name=".activities.SplashActivity"
             android:exported="true"
@@ -55,6 +56,8 @@
             android:name=".activities.LogoutActivity"
             android:exported="false"
             android:theme="@style/Theme.Netflix" />
+        <service android:name=".utils.TorrentDownloadService"/>
+
     </application>
 
 </manifest>
