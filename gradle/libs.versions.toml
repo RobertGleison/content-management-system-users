@@ -1,4 +1,5 @@
 [versions]
+commonsTextVersion = "1.10.0"
 googleCloudStorage = "2.22.4"
 libtorrent4j = "2.0.7-16"
 libtorrent4jArm64 = "2.x.x"
@@ -73,6 +74,7 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 
 # Firebase
+apache-commons-text = { module = "org.apache.commons:commons-text", version.ref = "commonsTextVersion" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }

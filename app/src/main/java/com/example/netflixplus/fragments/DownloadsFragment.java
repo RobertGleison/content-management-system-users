@@ -20,6 +20,7 @@ import com.example.netflixplus.entities.MediaResponseDTO;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.text.WordUtils;
 
 public class DownloadsFragment extends Fragment {
     private View rootView;
@@ -61,19 +62,27 @@ public class DownloadsFragment extends Fragment {
         List<MediaResponseDTO> downloadedMovies = new ArrayList<>();
 
         // Get the downloads directory
-        File downloadDir = new File(requireContext().getExternalFilesDir(null), "Downloads");
-
+        File downloadDir = requireContext().getFilesDir();
+        System.out.println("dir" + downloadDir);
         if (downloadDir.exists() && downloadDir.isDirectory()) {
             // List all MP4 files
-            File[] files = downloadDir.listFiles((dir, name) -> name.toLowerCase().endsWith(".mp4"));
+            System.out.println("Checking download Folder");
+            File[] files = downloadDir.listFiles();
 
             if (files != null) {
-                for (File file : files) {
+                for (File folder : files) {
                     // Create a MediaResponseDTO for each file
-                    MediaResponseDTO media = new MediaResponseDTO();
-                    media.setTitle(getMovieNameFromFilename(file.getName()));
-                    media.setFilePath(file.getAbsolutePath());
-                    downloadedMovies.add(media);
+                    System.out.println(folder);
+                    File[] movies = folder.listFiles();
+                    if (movies != null){
+                        for (File movie : movies) {
+                            System.out.println(movie.toString());
+                            MediaResponseDTO media = new MediaResponseDTO();
+                            media.setTitle(formatName(folder.getName(),movie.getName()));
+                            media.setFilePath(movie.getAbsolutePath());
+                            downloadedMovies.add(media);
+                        }
+                    }
                 }
             }
         }
@@ -81,13 +90,9 @@ public class DownloadsFragment extends Fragment {
         return downloadedMovies;
     }
 
-
-    private String getMovieNameFromFilename(String filename) {
-        // Remove the quality suffix and extension
-        // Example: "Movie_Name_HD.mp4" becomes "Movie Name"
-        String nameWithoutExtension = filename.substring(0, filename.lastIndexOf('.'));
-        String nameWithoutQuality = nameWithoutExtension.replaceAll("_(HD|SD)$", "");
-        return nameWithoutQuality.replace('_', ' ');
+    private String formatName(String name, String name1) {
+        String input = name.replace('_', ' ');
+        return WordUtils.capitalizeFully(input)  +" "+ name1.substring(0,2);
     }
 
 

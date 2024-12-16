@@ -132,6 +132,7 @@ dependencies {
     implementation(libs.retrofit.converter.gson)
     implementation(libs.gson)
     implementation(libs.okhttp3)
+    implementation(libs.apache.commons.text)
 
     // UI Components
     implementation(libs.material)
