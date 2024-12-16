@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.media.MediaScannerConnection;
 import android.os.Build;
 import android.os.Bundle;
@@ -69,7 +70,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         IntentFilter filter = new IntentFilter("com.example.netflixplus.TORRENT_DOWNLOAD_COMPLETE");
         registerReceiver(torrentReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
 
-
+        getWindow().setStatusBarColor(Color.DKGRAY);
         initializeViews();
         setupClickListeners();
         setupQualityToggle();
