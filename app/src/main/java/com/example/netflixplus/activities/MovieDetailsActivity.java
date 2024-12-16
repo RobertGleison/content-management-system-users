@@ -170,6 +170,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         serviceIntent.putExtra("title", convertedTitle);
         serviceIntent.putExtra("quality", quality);
         serviceIntent.putExtra("accessToken", RetrofitClient.getIdToken());
+        serviceIntent.putExtra("id", id);
         System.out.println("Gonna Start service" + serviceIntent);
         this.startService(serviceIntent);
     }

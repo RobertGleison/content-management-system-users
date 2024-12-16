@@ -66,6 +66,9 @@ public class TorrentManager {
         });
         s.start();
     }
+    public File getOutputDirectory(){
+        return outputDirectory;
+    }
     public File downloadTorrent(byte[] torrent, String movieName, String token){
         TorrentInfo torrentInfo = new TorrentInfo(torrent);
         String filename = torrentInfo.files().fileName(0);
@@ -96,4 +99,5 @@ public class TorrentManager {
         System.out.println("Finished downloading movie to: " + result.getAbsolutePath());
         return result;
     }
+
 }

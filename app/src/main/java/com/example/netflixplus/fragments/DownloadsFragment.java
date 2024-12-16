@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.netflixplus.R;
 import com.example.netflixplus.activities.VideoPlayerActivity;
 import com.example.netflixplus.entities.MediaResponseDTO;
+import com.example.netflixplus.utils.TorrentManager;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -62,7 +63,7 @@ public class DownloadsFragment extends Fragment {
         List<MediaResponseDTO> downloadedMovies = new ArrayList<>();
 
         // Get the downloads directory
-        File downloadDir = requireContext().getFilesDir();
+        File downloadDir = TorrentManager.getInstance(new File(getContext().getFilesDir(), "Downloads")).getOutputDirectory();
         System.out.println("dir" + downloadDir);
         if (downloadDir.exists() && downloadDir.isDirectory()) {
             // List all MP4 files

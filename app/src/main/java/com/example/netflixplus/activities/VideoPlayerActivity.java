@@ -5,6 +5,8 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
+
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,6 +22,7 @@ import androidx.media3.ui.PlayerView;
 
 import com.example.netflixplus.R;
 import com.example.netflixplus.retrofitAPI.RetrofitClient;
+import com.example.netflixplus.retrofitAPI.RetrofitNetworkConfig;
 import com.example.netflixplus.utils.MovieProgressManager;
 
 public class VideoPlayerActivity extends AppCompatActivity {
@@ -41,6 +44,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
         }
     };
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,24 +52,59 @@ public class VideoPlayerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_video_player);
 
         progressManager = new MovieProgressManager(this);
-        boolean isHighQuality = getIntent().getBooleanExtra("isHighQuality", true);
-        id = getIntent().getStringExtra("id");
-        String title = getIntent().getStringExtra("title");
+
 
         // Store PlayerView as class member
         playerView = findViewById(R.id.videoPlayer);
-
+        boolean isHighQuality = getIntent().getBooleanExtra("isHighQuality", true);
+        id = getIntent().getStringExtra("id");
+        String title = getIntent().getStringExtra("title");
         if (id != null) {
+            Log.d("Player", "id not null");
             int savedMinutes = progressManager.getProgress(id);
             if (savedMinutes > 0) {
                 showResumeDialog(savedMinutes);
             } else {
-                initializePlayer(title, isHighQuality, 0);
-                playerView.setPlayer(player);
-                startProgressTracking();
+               initializePlayer(getMediaItem(), 0);
+               startProgressTracking();
             }
+        } else {
+            Log.d("Player", "No ID found");
+            initializePlayer(getMediaItem(), 0);
         }
     }
+
+    private MediaItem getMediaItem(){
+        boolean isHighQuality = getIntent().getBooleanExtra("isHighQuality", true);
+        String title = getIntent().getStringExtra("title");
+        String path = getIntent().getStringExtra("videoPath");
+        if (path != null){
+            System.out.println("Getting movie from file");
+            return getMediaItemFromFile(path);
+        }else{
+            System.out.println("Streaming movie");
+            return getMediaItemFromWeb(title, isHighQuality);
+        }
+    }
+
+    private MediaItem getMediaItemFromFile(String path) {
+        String uri = "file://" + path;
+        Log.d("Player Url", uri);
+        MediaItem item = MediaItem.fromUri(uri);
+        player = new ExoPlayer.Builder(this).build();
+        return item;
+    }
+//        boolean isHighQuality = getIntent().getBooleanExtra("isHighQuality", true);
+//        id = getIntent().getStringExtra("id");
+//        String title = getIntent().getStringExtra("title");
+//       if (id != null){
+//           int savedMinutes = progressManager.getProgress(id);
+//            } if (savedMinutes > 0) {
+//                showResumeDialog(savedMinutes);
+//       } else {
+//           mediaItemFromweb()
+//       }
+
 
     private void showResumeDialog(int savedMinutes) {
         new AlertDialog.Builder(this)
@@ -75,19 +114,17 @@ public class VideoPlayerActivity extends AppCompatActivity {
                     long milliseconds = savedMinutes * 60L * 1000L;
                     // Release existing player if any
                     releasePlayer();
-                    initializePlayer(getIntent().getStringExtra("title"),
-                            getIntent().getBooleanExtra("isHighQuality", true),
+                    initializePlayer(getMediaItem(),
                             milliseconds);
-                    playerView.setPlayer(player);
+
                     startProgressTracking();
                 })
                 .setNegativeButton("Start Over", (dialog, which) -> {
                     // Release existing player if any
                     releasePlayer();
-                    initializePlayer(getIntent().getStringExtra("title"),
-                            getIntent().getBooleanExtra("isHighQuality", true),
+                    initializePlayer(getMediaItem(),
                             0);
-                    playerView.setPlayer(player);
+
                     startProgressTracking();
                 })
                 .show();
@@ -110,7 +147,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
     }
 
     @OptIn(markerClass = UnstableApi.class)
-    private void initializePlayer(String title, boolean isHighQuality, long startPosition) {
+    private MediaItem getMediaItemFromWeb(String title, boolean isHighQuality){
         String filename = title.replaceAll("[^a-zA-Z0-9]", "_").toLowerCase();
 
         HttpDataSource.Factory httpDataSourceFactory = new DefaultHttpDataSource.Factory()
@@ -129,15 +166,23 @@ public class VideoPlayerActivity extends AppCompatActivity {
                 .build();
 
         String quality = isHighQuality ? "HD_HLS" : "LD_HLS";
-        String selectedUrl = "http://34.91.139.20:80/movies/" +
+        String selectedUrl = RetrofitNetworkConfig.BASE_URL + "movies/" +
                 filename +
                 "/" +
                 quality +
                 "/output.m3u8";
+        System.out.println("Url " + selectedUrl);
+        MediaItem item = MediaItem.fromUri(selectedUrl);
+        System.out.println(item);
+        return item;
+    }
 
-        player.setMediaItem(MediaItem.fromUri(selectedUrl));
+    private void initializePlayer(MediaItem item, long startPosition) {
+        System.out.println(item);
+        player.addMediaItem(item);
         player.prepare();
         player.seekTo(startPosition);
+        playerView.setPlayer(player);
         player.play();
 
         player.addListener(new Player.Listener() {

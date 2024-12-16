@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
+import android.widget.Toast;
 
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -56,7 +57,7 @@ public class TorrentDownloadService extends Service {
         byte[] torrent = null;
         HttpURLConnection connection = null;
         InputStream inputStream = null;
-        File dir = this.getFilesDir();
+        File dir = new File(this.getFilesDir(), "Downloads");
         TorrentManager torrentManager = TorrentManager.getInstance(dir);
         try {
             System.out.println("Entered Try Block");
@@ -99,12 +100,12 @@ public class TorrentDownloadService extends Service {
         Intent intent = new Intent("com.example.TORRENT_DOWNLOAD_COMPLETE");
         if (outfile != null) {
             intent.putExtra("filePath", outfile.getAbsolutePath());
+            intent.putExtra("id", parentIntent.getStringExtra("id"));
         } else {
             intent.putExtra("error", "Download failed");
         }
-        System.out.println("Intent Sent");
+        System.out.println("Broadcasting Intent");
         sendBroadcast(intent);
-        System.out.println("Intent Sent");
         stopSelf();
     }
 
