@@ -1,9 +1,9 @@
 package com.example.netflixplus.utils;
 
+import com.example.netflixplus.retrofitAPI.RetrofitNetworkConfig;
+
 import org.libtorrent4j.AlertListener;
-import org.libtorrent4j.InfoHash;
 import org.libtorrent4j.SessionManager;
-import org.libtorrent4j.Sha1Hash;
 import org.libtorrent4j.TorrentHandle;
 import org.libtorrent4j.TorrentInfo;
 import org.libtorrent4j.alerts.AddTorrentAlert;
@@ -27,7 +27,6 @@ public class TorrentManager {
     TorrentManager(File outputDirectory){
         this.outputDirectory = outputDirectory;
         s = new SessionManager();
-
         signal = new CountDownLatch(1);
         s.addListener(new AlertListener() {
             @Override
@@ -59,8 +58,12 @@ public class TorrentManager {
         });
         s.start();
     }
-    public File downloadTorrent(byte[] torrent, String movieName){
+    public File downloadTorrent(byte[] torrent, String movieName, String token){
         TorrentInfo torrentInfo = new TorrentInfo(torrent);
+        String filename = torrentInfo.files().fileName(0);
+        String httpSeed = String.format("http://%s/%s/%s/%s", RetrofitNetworkConfig.BASE_URL, "movies", movieName, filename);
+        System.out.println("httpSeed = " + httpSeed);
+        torrentInfo.addHttpSeed(httpSeed, "Bearer " + token);
         s.download(torrentInfo,outputDirectory);
         System.out.println("Starting Download");
         TorrentHandle handle = s.find(torrentInfo.infoHash());
@@ -80,7 +83,7 @@ public class TorrentManager {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        String fileName = torrentInfo.files().fileName(0);
-        return new File(outputDirectory, fileName);
+        String outFile = filename + "_" + movieName + ".mp4";
+        return new File(outputDirectory, outFile);
     }
 }
