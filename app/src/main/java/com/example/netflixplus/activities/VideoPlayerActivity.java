@@ -31,14 +31,14 @@ public class VideoPlayerActivity extends AppCompatActivity {
     private final String authToken = RetrofitClient.getIdToken();
     private String id;
     private PlayerView playerView;
-    private static final int PROGRESS_UPDATE_INTERVAL = 60000; // 1 minute in milliseconds
+    private static final int PROGRESS_UPDATE_INTERVAL = 1000; // 1 second in milliseconds
     private final Handler progressHandler = new Handler(Looper.getMainLooper());
     private final Runnable progressUpdateRunnable = new Runnable() {
         @Override
         public void run() {
             if (player != null && player.isPlaying()) {
-                int currentMinutes = (int) (player.getCurrentPosition() / 1000 / 60);
-                progressManager.saveProgress(id, currentMinutes);
+                int currentMiliseconds = (int) (player.getCurrentPosition());
+                progressManager.saveProgress(id, currentMiliseconds);
             }
             progressHandler.postDelayed(this, PROGRESS_UPDATE_INTERVAL);
         }
@@ -109,9 +109,9 @@ public class VideoPlayerActivity extends AppCompatActivity {
     private void showResumeDialog(int savedMinutes) {
         new AlertDialog.Builder(this)
                 .setTitle("Resume Playback")
-                .setMessage("Would you like to resume from " + savedMinutes + " minutes?")
+                .setMessage("Would you like to resume from " + savedMinutes / 1000 + " seconds?")
                 .setPositiveButton("Resume", (dialog, which) -> {
-                    long milliseconds = savedMinutes * 60L * 1000L;
+                    long milliseconds = savedMinutes;
                     // Release existing player if any
                     releasePlayer();
                     initializePlayer(getMediaItem(),
@@ -200,7 +200,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         if (player != null && id != null) {
-            int currentMinutes = (int) (player.getCurrentPosition() / 1000 / 60);
+            int currentMinutes = (int) (player.getCurrentPosition());
             progressManager.saveProgress(id, currentMinutes);
         }
         stopProgressTracking();
@@ -219,7 +219,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
         super.onDestroy();
         if (player != null) {
             if (id != null) {
-                int currentMinutes = (int) (player.getCurrentPosition() / 1000 / 60);
+                int currentMinutes = (int) (player.getCurrentPosition());
                 progressManager.saveProgress(id, currentMinutes);
             }
             releasePlayer();
