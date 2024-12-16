@@ -197,6 +197,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
             int currentMinutes = (int) (player.getCurrentPosition());
             progressManager.saveProgress(id, currentMinutes);
         }
+        player.pause();
         stopProgressTracking();
     }
 
