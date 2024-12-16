@@ -62,12 +62,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
         if (id != null) {
             Log.d("Player", "id not null");
             int savedMinutes = progressManager.getProgress(id);
-            if (savedMinutes > 0) {
-                showResumeDialog(savedMinutes);
-            } else {
-               initializePlayer(getMediaItem(), 0);
-               startProgressTracking();
-            }
+            playVideo(savedMinutes);
         } else {
             Log.d("Player", "No ID found");
             initializePlayer(getMediaItem(), 0);
@@ -105,27 +100,26 @@ public class VideoPlayerActivity extends AppCompatActivity {
 //           mediaItemFromweb()
 //       }
 
+    private void playVideo(int savedMinutes) {
+        long milliseconds = savedMinutes;
+        // Release existing player if any
+        releasePlayer();
+        initializePlayer(getMediaItem(),
+                milliseconds);
+
+        startProgressTracking();
+    }
 
     private void showResumeDialog(int savedMinutes) {
         new AlertDialog.Builder(this)
                 .setTitle("Resume Playback")
                 .setMessage("Would you like to resume from " + savedMinutes / 1000 + " seconds?")
                 .setPositiveButton("Resume", (dialog, which) -> {
-                    long milliseconds = savedMinutes;
-                    // Release existing player if any
-                    releasePlayer();
-                    initializePlayer(getMediaItem(),
-                            milliseconds);
-
-                    startProgressTracking();
+                    playVideo(savedMinutes);
                 })
                 .setNegativeButton("Start Over", (dialog, which) -> {
                     // Release existing player if any
-                    releasePlayer();
-                    initializePlayer(getMediaItem(),
-                            0);
-
-                    startProgressTracking();
+                    playVideo(0);
                 })
                 .show();
     }
